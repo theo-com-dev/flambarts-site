@@ -2,7 +2,8 @@ backend:
   name: github
   repo: theo-com-dev/flambarts-site
   branch: main
-  # base_url : ajouté à l'étape « connexion » (serveur d'authentification GitHub).
+  base_url: https://flambarts.vercel.app
+  auth_endpoint: api/auth
 
 # Dossier où arrivent les photos ajoutées depuis l'interface.
 media_folder: public/img/uploads
