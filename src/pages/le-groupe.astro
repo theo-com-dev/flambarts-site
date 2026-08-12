@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+const musiciens = [
+  { nom: 'Pascal', role: 'Guitare acoustique', img: '/img/portraits/pascal.jpg' },
+  { nom: 'Robert', role: 'Basse & guitares', img: '/img/portraits/robert.jpg' },
+  { nom: 'Michel', role: 'Accordéon diatonique', img: '/img/portraits/michel.jpg' },
+  { nom: 'Louis', role: 'Accordéon chromatique', img: '/img/portraits/louis.jpg' },
+  { nom: 'Loïc', role: 'Cajon & percussions', img: '/img/portraits/loic.jpg' },
+  { nom: 'Dominique', role: 'Chant', img: '/img/portraits/dominique.jpg' },
+  { nom: 'Émilie', role: 'Chant', img: '/img/portraits/emilie.jpg' },
+];
+---
+<Base active="groupe" title="Le groupe" description="Les Flambarts : sept musiciens d'Herbignac et de sa région, réunis autour des chants marins traditionnels.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Le groupe</h1>
+      <p class="lead">
+        On vient tous d'Herbignac et des environs. On chante les grands classiques marins,
+        ceux qu'on reprend en chœur. Guitare, deux accordéons, basse, cajon et deux voix :
+        de quoi remplir une salle de village comme un grand festival.
+      </p>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap">
+      <div class="grid grid-3">
+        {musiciens.map((m) => (
+          <div class="card musicien">
+            <img class="musicien-ph" src={m.img} alt={`${m.nom}, ${m.role}`} width="150" height="150" loading="lazy" />
+            <h3 class="serif" style="font-size:1.35rem;margin-top:16px">{m.nom}</h3>
+            <div class="musicien-role">{m.role}</div>
+          </div>
+        ))}
+        <div class="card musicien join">
+          <div class="join-flame"><Icon name="flame" size={34} /></div>
+          <h3 class="serif" style="font-size:1.35rem">Envie de nous rejoindre&nbsp;?</h3>
+          <p style="color:#cfe0e8;margin:8px 0 16px">
+            On aime partager la scène et la bonne humeur. Musicien·ne de chant marin&nbsp;?
+            Écris-nous, on en discute autour d'un verre.
+          </p>
+          <a class="btn btn-primary" href="/contact">Nous écrire →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad concept-band">
+    <div class="wrap">
+      <div class="groupe-intro">
+        <span class="kicker">Notre esprit</span>
+        <h2 class="h-lg" style="margin:14px 0 16px">Notre façon de jouer</h2>
+        <p class="lead">
+          On prépare nos concerts sérieusement, et on les joue le sourire aux lèvres. On vient
+          avec notre matériel et on s'installe où il faut, entre les tables comme sur une scène.
+          Ce qu'on veut, c'est que la salle chante avec nous.
+        </p>
+        <a class="btn btn-marine" style="margin-top:22px" href="/prestations">Voir nos prestations →</a>
+      </div>
+      <div class="groupe-duo">
+        <img src="/img/groupe.jpg" alt="Le groupe Les Flambarts" width="1024" height="768" loading="lazy" />
+        <img src="/img/groupe-scene.jpg" alt="Les Flambarts sur scène au festival Voix Marines" width="1600" height="1320" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero .kicker{margin-bottom:16px}
+  .page-hero h1{margin-bottom:18px}
+  .musicien{text-align:center}
+  .musicien-ph{width:150px;height:150px;border-radius:50%;object-fit:cover;margin:0 auto;background:var(--placeholder);display:block}
+  .musicien-role{color:var(--terracotta);font-weight:600;font-size:.92rem;margin-top:4px}
+  .join{display:flex;flex-direction:column;justify-content:center;text-align:center;background:var(--marine);color:#fff}
+  .join h3{color:#fff}
+  .join-flame{color:var(--orange);margin-bottom:8px}
+  .concept-band{background:var(--creme-2)}
+  .groupe-intro{max-width:660px}
+  .groupe-duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+  .groupe-duo img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius);box-shadow:var(--shadow);display:block}
+  @media(max-width:700px){.groupe-duo{grid-template-columns:1fr}}
+</style>

@@ -1,0 +1,120 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+const prestations = [
+  { ico: 'glass', titre: 'Restaurants & bars', txt: "On passe entre les tables et on chante, sans couvrir les conversations. Vos clients restent, et ils reviennent." },
+  { ico: 'building', titre: "Événements d'entreprise", txt: "Séminaires, inaugurations, soirées clients. Un moment qui change des discours et fait chanter les équipes." },
+  { ico: 'bunting', titre: 'Fêtes locales & maritimes', txt: "Fêtes de la musique, courses à la voile, 14 juillet. Sur scène, avec le répertoire qui fait lever la foule." },
+  { ico: 'buoy', titre: 'Œuvres caritatives', txt: "Téléthon, associations, soirées solidaires. On répond présents pour les belles causes, avec la même énergie." },
+  { ico: 'lantern', titre: 'Fêtes privées', txt: "Anniversaires, mariages, retrouvailles entre amis. L'ambiance qui met tout le monde d'accord." },
+  { ico: 'anchor', titre: 'Rassemblements maritimes', txt: "Fêtes du port, festivals de chants de marins, quais animés. C'est notre terrain de jeu, au plus près de l'eau." },
+];
+const inclus = [
+  ['note', 'Deux parties de 45 minutes', 'Avec un entracte de 30 minutes au milieu. On adapte selon votre soirée.'],
+  ['bolt', 'On est autonomes', 'On apporte sono, micros et matériel. Une prise secteur suffit.'],
+  ['ruler', 'Six mètres sur trois', "L'espace pour installer les sept musiciens. En déambulation, on se passe de scène."],
+  ['clock', "Prêts à l'heure dite", "On arrive une heure à une heure trente avant, le temps de tout brancher."],
+];
+---
+<Base active="prestations" title="Prestations" description="Restaurants, événements d'entreprise, fêtes locales, caritatif : Les Flambarts s'adaptent à toutes vos occasions, en toute autonomie.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Prestations</h1>
+      <p class="lead">
+        On ajuste le volume et le répertoire à votre événement, d'une petite salle à une grande
+        scène. On arrive en avance, on gère notre son, vous n'avez qu'à profiter.
+      </p>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap">
+      <div class="grid grid-3">
+        {prestations.map((p) => (
+          <div class="card presta">
+            <div class="presta-ico"><Icon name={p.ico} /></div>
+            <h3 class="serif" style="font-size:1.3rem;margin-bottom:10px">{p.titre}</h3>
+            <p style="color:var(--encre-soft)">{p.txt}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="pad practique">
+    <div class="wrap">
+      <div class="section-head center">
+        <span class="kicker">En pratique</span>
+        <h2 class="h-lg">Comment ça se passe</h2>
+      </div>
+      <div class="grid grid-2">
+        {inclus.map((i) => (
+          <div class="prat">
+            <div class="prat-ico"><Icon name={i[0]} /></div>
+            <div>
+              <div class="prat-t serif">{i[1]}</div>
+              <p style="color:var(--encre-soft);margin-top:4px">{i[2]}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p class="note-band">
+        À votre charge : l'accès pour l'installation, les boissons et, selon l'organisation, le repas des musiciens.
+        Supports de communication (affiches, photos) possibles sur demande, 20 jours avant l'événement.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FICHE TECHNIQUE (PDF) ============ -->
+  <section class="pad-sm">
+    <div class="wrap">
+      <div class="fiche-band">
+        <div class="fiche-txt">
+          <span class="kicker">Pour les organisateurs</span>
+          <h2 class="h-lg" style="margin-top:10px">La fiche technique</h2>
+          <p style="color:var(--encre-soft);max-width:48ch;margin-top:8px">
+            Formation, matériel, plan de scène et déroulé : tout est réuni dans notre fiche technique à jour.
+          </p>
+        </div>
+        <a class="btn btn-marine fiche-btn" href="/fiche-technique-les-flambarts.pdf" download>
+          <Icon name="ruler" size={22} /> Télécharger la fiche (PDF)
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-final">
+    <div class="wrap center">
+      <h2 class="h-lg" style="color:#fff;max-width:20ch;margin:0 auto 14px">Une question sur le groupe&nbsp;?</h2>
+      <p style="color:#ffe3d4;max-width:52ch;margin:0 auto 26px">
+        Envie d'en savoir plus, ou de nous voir jouer près de chez vous&nbsp;? Écrivez-nous, on répond avec plaisir.
+      </p>
+      <a class="btn cta-btn" href="/contact">Nous contacter</a>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero .kicker{margin-bottom:16px}
+  .page-hero h1{margin-bottom:18px}
+  .presta-ico{width:58px;height:58px;border-radius:14px;background:var(--sable);color:var(--terracotta);
+    display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .presta{transition:transform .18s,box-shadow .2s}
+  .presta:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .practique{background:var(--creme-2)}
+  .prat{display:flex;gap:16px;background:#fff;border:1px solid rgba(42,32,24,.07);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)}
+  .prat-ico{flex:0 0 auto;color:var(--terracotta)}
+  .prat-t{font-size:1.15rem}
+  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;max-width:70ch;margin-left:auto;margin-right:auto}
+  .fiche-band{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    background:#fff;border:1px solid rgba(42,32,24,.08);border-radius:var(--radius);padding:30px 34px;box-shadow:var(--shadow-sm)}
+  .fiche-btn{display:inline-flex;align-items:center;gap:10px;font-size:1rem;white-space:nowrap}
+  @media(max-width:640px){.fiche-band{flex-direction:column;align-items:flex-start}}
+  .cta-final{background:linear-gradient(135deg,var(--terracotta),var(--terracotta-d));padding:clamp(56px,8vw,96px) 0}
+  .cta-btn{background:#fff;color:var(--terracotta);font-size:1.05rem;padding:16px 32px}
+  .cta-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+</style>

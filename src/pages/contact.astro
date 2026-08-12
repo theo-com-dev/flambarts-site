@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base active="contact" title="Contact" description="Une question sur le groupe, envie de nous programmer ou juste de nous dire bonjour ? Écrivez aux Flambarts.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Contact</h1>
+      <p class="lead">
+        Une question sur le groupe, envie de nous voir jouer près de chez vous, ou juste de nous
+        dire bonjour&nbsp;? Écrivez-nous, on vous répond.
+      </p>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap contact-grid">
+
+      <div class="card form-card">
+        <h2 class="serif" style="font-size:1.5rem;margin-bottom:6px">Écrivez-nous</h2>
+        <p style="color:var(--encre-soft);margin-bottom:22px">Les champs marqués d'un * nous permettent de vous répondre.</p>
+
+        <!-- Formulaire via Web3Forms (gratuit). Remplacer la clé ci-dessous par
+             celle reçue sur https://web3forms.com (associée à lesflambarts@gmail.com). -->
+        <form action="https://api.web3forms.com/submit" method="POST" class="form">
+          <input type="hidden" name="access_key" value="VOTRE_CLE_WEB3FORMS" />
+          <input type="hidden" name="subject" value="Nouveau message depuis le site Les Flambarts" />
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
+
+          <div class="row">
+            <label>Nom *<input type="text" name="nom" required /></label>
+            <label>Email *<input type="email" name="email" required /></label>
+          </div>
+          <div class="row">
+            <label>Téléphone<input type="tel" name="telephone" /></label>
+            <label>Type d'événement
+              <select name="type">
+                <option>Restaurant / bar</option>
+                <option>Événement d'entreprise</option>
+                <option>Fête locale / maritime</option>
+                <option>Caritatif</option>
+                <option>Fête privée</option>
+                <option>Autre</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label>Date souhaitée<input type="date" name="date" /></label>
+            <label>Lieu / ville<input type="text" name="lieu" /></label>
+          </div>
+          <label>Votre message *<textarea name="message" rows="5" required placeholder="Parlez-nous de votre événement : ambiance souhaitée, nombre de personnes, horaires…"></textarea></label>
+
+          <button type="submit" class="btn btn-primary" style="margin-top:8px">Envoyer le message</button>
+        </form>
+      </div>
+
+      <aside class="contact-side">
+        <div class="card">
+          <h3 class="serif" style="font-size:1.3rem;margin-bottom:16px">Nous joindre directement</h3>
+          <a class="contact-line" href="tel:+33614843588">
+            <span class="ci"><Icon name="phone" size={24} /></span><span><strong>06 14 84 35 88</strong><br /><small>Du lundi au samedi</small></span>
+          </a>
+          <a class="contact-line" href="mailto:lesflambarts@gmail.com">
+            <span class="ci"><Icon name="mail" size={24} /></span><span><strong>lesflambarts@gmail.com</strong><br /><small>Réponse sous 48 h</small></span>
+          </a>
+          <div class="contact-line">
+            <span class="ci"><Icon name="pin" size={24} /></span><span><strong>Herbignac (44)</strong><br /><small>Presqu'île guérandaise · on se déplace en Bretagne et alentours</small></span>
+          </div>
+          <div class="contact-line">
+            <span class="ci"><Icon name="megaphone" size={24} /></span><span><strong>Les Flambarts</strong><br /><small>Retrouvez-nous sur les réseaux</small></span>
+          </div>
+        </div>
+        <div class="card side-note">
+          <div style="color:var(--orange)"><Icon name="flame" size={34} /></div>
+          <p style="color:#cfe0e8;margin-top:10px">
+            On est autonomes en son et matériel, une prise secteur suffit. On s'adapte à tous les
+            formats, de la déambulation à la grande scène.
+          </p>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero .kicker{margin-bottom:16px}
+  .page-hero h1{margin-bottom:18px}
+  .contact-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:start}
+  @media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
+  .form{display:flex;flex-direction:column;gap:16px}
+  .form .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.form .row{grid-template-columns:1fr}}
+  .form label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.88rem;color:var(--encre)}
+  .form input,.form select,.form textarea{
+    font-family:var(--sans);font-size:1rem;padding:12px 14px;border:1.5px solid rgba(42,32,24,.16);
+    border-radius:12px;background:#fff;color:var(--encre);font-weight:400;transition:border-color .15s}
+  .form input:focus,.form select:focus,.form textarea:focus{outline:none;border-color:var(--terracotta)}
+  .form textarea{resize:vertical}
+  .contact-side{display:flex;flex-direction:column;gap:20px}
+  .contact-line{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(42,32,24,.08)}
+  .contact-line:last-child{border-bottom:0}
+  .ci{color:var(--terracotta);flex:0 0 auto;margin-top:2px}
+  .contact-line small{color:var(--encre-soft)}
+  .side-note{background:var(--marine);color:#eaf1f4}
+</style>

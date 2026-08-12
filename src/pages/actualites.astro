@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+
+// À terme, ces actualités seront gérées depuis le back-office (/admin) par les membres.
+// Pour l'instant : exemples statiques.
+const actus = [
+  { date: '2 août 2026', tag: 'Concert', titre: 'Une belle soirée pour la Fête du Port', extrait: "Retour en images sur notre passage au Croisic : un public au rendez-vous et des refrains repris jusque tard dans la nuit." },
+  { date: '15 juillet 2026', tag: 'Événement', titre: 'Moules-frites du 14 juillet à Herbignac', extrait: "Comme chaque année, on a mis l'ambiance pour la fête nationale, entre deux assiettes de moules-frites." },
+  { date: '20 juin 2026', tag: 'Nouveauté', titre: 'Trois nouveaux titres au répertoire', extrait: "On a ajouté de nouveaux chants à reprendre en chœur. Venez les découvrir à notre prochain concert." },
+];
+const agenda = [
+  { j: '15', m: 'AOÛT', quand: 'Samedi · 18h00', lieu: 'Fête du Port', ville: 'Le Croisic (44)', info: 'Entrée libre' },
+  { j: '21', m: 'AOÛT', quand: 'Vendredi · 20h30', lieu: 'Festival Chants de Marins', ville: 'Paimpol (22)', info: 'Billetterie' },
+  { j: '05', m: 'SEPT', quand: 'Samedi · 17h00', lieu: 'Fête de la Mer', ville: 'La Turballe (44)', info: 'Entrée libre' },
+];
+---
+<Base active="actualites" title="Actualités" description="Les dernières nouvelles des Flambarts : concerts, dates à venir et coulisses.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Actualités</h1>
+      <p class="lead">
+        Nos derniers concerts, les dates à venir et quelques coulisses. Suivez la vie du groupe
+        au fil des semaines.
+      </p>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap">
+      <h2 class="h-lg" style="margin-bottom:26px">Prochaines dates</h2>
+      <div class="grid grid-3">
+        {agenda.map((d) => (
+          <div class="date card">
+            <div class="date-badge"><strong>{d.j}</strong><span>{d.m}</span></div>
+            <div>
+              <div class="date-when">{d.quand}</div>
+              <div class="date-lieu serif">{d.lieu}</div>
+              <div class="date-ville">{d.ville}</div>
+              <span class="date-info">{d.info}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" style="padding-top:clamp(30px,5vw,60px)">
+    <div class="wrap">
+      <h2 class="h-lg" style="margin-bottom:26px">Le journal du groupe</h2>
+      <div class="grid grid-3">
+        {actus.map((a) => (
+          <article class="actu">
+            <div class="ph actu-ph"><span class="actu-tag">{a.tag}</span></div>
+            <div class="actu-date">{a.date}</div>
+            <h3 class="serif" style="font-size:1.3rem;margin:4px 0 8px">{a.titre}</h3>
+            <p style="color:var(--encre-soft)">{a.extrait}</p>
+          </article>
+        ))}
+      </div>
+      <p class="note-band">Ces articles sont des exemples. Bientôt, les membres du groupe pourront les publier eux-mêmes depuis l'espace d'administration.</p>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero .kicker{margin-bottom:16px}
+  .page-hero h1{margin-bottom:18px}
+  .date{display:flex;gap:18px;align-items:center}
+  .date-badge{flex:0 0 auto;width:64px;height:64px;border-radius:14px;background:var(--terracotta);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .date-badge strong{font-family:var(--serif);font-size:1.5rem}
+  .date-badge span{font-size:.7rem;letter-spacing:.08em;margin-top:2px}
+  .date-when{font-size:.82rem;color:var(--encre-soft);font-weight:600}
+  .date-lieu{font-size:1.15rem;margin:2px 0}
+  .date-ville{font-size:.9rem;color:var(--encre-soft)}
+  .date-info{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--iode);background:rgba(28,110,126,.1);padding:3px 10px;border-radius:999px}
+  .actu-ph{aspect-ratio:16/10;align-items:flex-start;justify-content:flex-start;padding:14px}
+  .actu-tag{background:var(--terracotta);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 11px;border-radius:999px}
+  .actu-date{color:var(--terracotta);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-top:14px}
+  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;max-width:70ch;margin-left:auto;margin-right:auto}
+</style>

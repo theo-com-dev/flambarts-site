@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Mentions légales" description="Mentions légales du site des Flambarts, groupe de chants marins d'Herbignac.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Mentions légales</h1>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap legal">
+
+      <h2>Éditeur du site</h2>
+      <p>
+        Les Flambarts, groupe de chants marins.<br />
+        Herbignac (44), France.<br />
+        Téléphone : <a href="tel:+33614843588">06 14 84 35 88</a><br />
+        Courriel : <a href="mailto:lesflambarts@gmail.com">lesflambarts@gmail.com</a>
+      </p>
+      <p class="todo">À compléter : nom et statut exact (association loi 1901, nom du responsable de publication), et adresse postale si vous en indiquez une.</p>
+
+      <h2>Hébergement</h2>
+      <p>
+        Le site est hébergé par Vercel Inc.<br />
+        340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis — <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>
+      </p>
+
+      <h2>Propriété intellectuelle</h2>
+      <p>
+        Les textes, photographies et le logo présents sur ce site appartiennent aux Flambarts.
+        Toute reproduction ou utilisation sans autorisation écrite est interdite.
+      </p>
+
+      <h2>Données personnelles</h2>
+      <p>
+        Les informations transmises via le formulaire de contact (nom, courriel, message) servent
+        uniquement à répondre à votre demande. Elles ne sont ni revendues ni transmises à des tiers.
+        Vous pouvez demander leur accès ou leur suppression en écrivant à
+        <a href="mailto:lesflambarts@gmail.com">lesflambarts@gmail.com</a>.
+      </p>
+
+      <h2>Cookies</h2>
+      <p>Ce site n'utilise aucun cookie de suivi ni outil de traçage publicitaire.</p>
+
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .legal{max-width:760px}
+  .legal h2{font-size:1.35rem;margin:32px 0 10px}
+  .legal h2:first-child{margin-top:0}
+  .legal p{color:var(--encre-soft);margin-bottom:6px;line-height:1.7}
+  .legal a{color:var(--terracotta);text-decoration:underline}
+  .legal .todo{font-size:.9rem;color:var(--iode);background:var(--sable);border-radius:10px;padding:10px 14px;margin-top:10px}
+</style>

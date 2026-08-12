@@ -1,0 +1,115 @@
+---
+import '../styles/global.css';
+
+const { title, description, active } = Astro.props;
+const pageTitle = title
+  ? `${title} · Les Flambarts`
+  : 'Les Flambarts · Chants marins & ambiance bord de mer';
+const desc = description ??
+  "Les Flambarts, 7 musiciens de chants marins d'Herbignac. Refrains à reprendre en chœur, 100 % bonne humeur, pour vos restaurants, événements, fêtes et soirées caritatives.";
+
+const nav = [
+  { href: '/', label: 'Accueil', key: 'accueil' },
+  { href: '/le-groupe', label: 'Le groupe', key: 'groupe' },
+  { href: '/prestations', label: 'Prestations', key: 'prestations' },
+  { href: '/actualites', label: 'Actualités', key: 'actualites' },
+  { href: '/contact', label: 'Contact', key: 'contact' },
+];
+
+// Réseaux sociaux des Flambarts.
+const social = {
+  youtube: 'https://www.youtube.com/@LesFlambarts',
+  facebook: 'https://www.facebook.com/p/Les-Flambarts-61557394624239/',
+};
+---
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={desc} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="/">
+        <img class="mark" src="/img/logo.jpg" alt="Logo Les Flambarts" width="42" height="42" />
+        <span>Les Flambarts</span>
+      </a>
+      <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="navlinks">
+        {nav.map((n) => (
+          <a href={n.href} aria-current={active === n.key ? 'page' : undefined}>{n.label}</a>
+        ))}
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <div class="ftr-grid">
+        <div>
+          <div class="brand" style="color:#fff;margin-bottom:14px">
+            <span>Les Flambarts</span>
+          </div>
+          <p style="max-width:36ch;color:#c9dbe3">
+            Groupe de chants marins d'Herbignac (44). Sept musiciens qui font chanter
+            restaurants, fêtes et événements au bord de l'eau.
+          </p>
+          <div class="ftr-social">
+            <a href={social.youtube} class="soc soc-yt" aria-label="Chaîne YouTube des Flambarts" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.5 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+            </a>
+            <a href={social.facebook} class="soc soc-fb" aria-label="Page Facebook des Flambarts" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1v-3.5h3v-2.1c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.24 2.7.24v3h-1.5c-1.5 0-1.9.93-1.9 1.9v1.7h3.3l-.53 3.5h-2.8v8.4A12 12 0 0 0 24 12Z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h4>Naviguer</h4>
+          <div class="ftr-links">
+            {nav.map((n) => (<a href={n.href}>{n.label}</a>))}
+          </div>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <div class="ftr-links">
+            <a href="tel:+33614843588">06 14 84 35 88</a>
+            <a href="mailto:lesflambarts@gmail.com">lesflambarts@gmail.com</a>
+            <a href="/contact">Nous contacter</a>
+          </div>
+        </div>
+      </div>
+      <div class="ftr-bottom">
+        <span>© {new Date().getFullYear()} Les Flambarts · Herbignac</span>
+        <span><a href="/mentions-legales">Mentions légales</a> · Chants marins &amp; ambiance bord de mer</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const links = document.getElementById('navlinks');
+    toggle?.addEventListener('click', () => {
+      const open = links?.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    links?.querySelectorAll('a').forEach((a) =>
+      a.addEventListener('click', () => links.classList.remove('open'))
+    );
+  </script>
+</body>
+</html>
