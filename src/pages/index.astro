@@ -28,7 +28,7 @@ const galerie = Object.entries(galModules)
   <!-- ============ HERO (scène animée) ============ -->
   <section class="hero">
     <div class="hero-scene" aria-hidden="true">
-      <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="/hero-poster.jpg">
+      <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="/hero-poster.jpg">
         <source src="/hero.mp4" type="video/mp4" />
       </video>
     </div>
@@ -193,10 +193,28 @@ const galerie = Object.entries(galModules)
 </Base>
 
 <script>
-  // Accessibilité : si l'utilisateur préfère les animations réduites, on fige la vidéo.
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('video.hero-video').forEach((v) => { v.removeAttribute('autoplay'); v.pause(); });
-  }
+  // Vidéo du hero : respecte « animations réduites », sinon force la lecture au mieux (mobile inclus).
+  document.querySelectorAll('video.hero-video').forEach((v) => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+      return;
+    }
+    v.muted = true; // requis pour l'autoplay sur mobile
+    const tryPlay = () => { const p = v.play(); if (p) p.catch(() => {}); };
+    tryPlay();
+    v.addEventListener('loadeddata', tryPlay, { once: true });
+    // Filet de sécurité : si l'autoplay est bloqué, on relance au 1er geste de l'utilisateur.
+    const onInteract = () => {
+      tryPlay();
+      window.removeEventListener('touchstart', onInteract);
+      window.removeEventListener('scroll', onInteract);
+      window.removeEventListener('click', onInteract);
+    };
+    window.addEventListener('touchstart', onInteract, { passive: true });
+    window.addEventListener('scroll', onInteract, { passive: true });
+    window.addEventListener('click', onInteract);
+  });
 
   // Galerie : lightbox au clic (navigation clavier + boutons).
   const lb = document.getElementById('lightbox');
