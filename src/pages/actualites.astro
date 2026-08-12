@@ -1,18 +1,28 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 
-// À terme, ces actualités seront gérées depuis le back-office (/admin) par les membres.
-// Pour l'instant : exemples statiques.
-const actus = [
-  { date: '2 août 2026', tag: 'Concert', titre: 'Une belle soirée pour la Fête du Port', extrait: "Retour en images sur notre passage au Croisic : un public au rendez-vous et des refrains repris jusque tard dans la nuit." },
-  { date: '15 juillet 2026', tag: 'Événement', titre: 'Moules-frites du 14 juillet à Herbignac', extrait: "Comme chaque année, on a mis l'ambiance pour la fête nationale, entre deux assiettes de moules-frites." },
-  { date: '20 juin 2026', tag: 'Nouveauté', titre: 'Trois nouveaux titres au répertoire', extrait: "On a ajouté de nouveaux chants à reprendre en chœur. Venez les découvrir à notre prochain concert." },
-];
-const agenda = [
-  { j: '15', m: 'AOÛT', quand: 'Samedi · 18h00', lieu: 'Fête du Port', ville: 'Le Croisic (44)', info: 'Entrée libre' },
-  { j: '21', m: 'AOÛT', quand: 'Vendredi · 20h30', lieu: 'Festival Chants de Marins', ville: 'Paimpol (22)', info: 'Billetterie' },
-  { j: '05', m: 'SEPT', quand: 'Samedi · 17h00', lieu: 'Fête de la Mer', ville: 'La Turballe (44)', info: 'Entrée libre' },
-];
+const moisCourts = ['JANV', 'FÉVR', 'MARS', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
+const joursSemaine = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const moisLongs = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+const agenda = (await getCollection('agenda')).sort(
+  (a, b) => a.data.date.getTime() - b.data.date.getTime()
+);
+const actus = (await getCollection('actualites')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const dateBadge = (d: Date) => ({
+  j: String(d.getUTCDate()).padStart(2, '0'),
+  m: moisCourts[d.getUTCMonth()],
+  jour: joursSemaine[d.getUTCDay()],
+});
+const dateLongue = (d: Date) => `${d.getUTCDate()} ${moisLongs[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+const extrait = (t: string) => {
+  const s = t.trim().replace(/\s+/g, ' ');
+  return s.length > 150 ? s.slice(0, 150).trim() + '…' : s;
+};
 ---
 <Base active="actualites" title="Actualités" description="Les dernières nouvelles des Flambarts : concerts, dates à venir et coulisses.">
 
@@ -26,39 +36,51 @@ const agenda = [
     </div>
   </section>
 
-  <section class="pad-sm">
-    <div class="wrap">
-      <h2 class="h-lg" style="margin-bottom:26px">Prochaines dates</h2>
-      <div class="grid grid-3">
-        {agenda.map((d) => (
-          <div class="date card">
-            <div class="date-badge"><strong>{d.j}</strong><span>{d.m}</span></div>
-            <div>
-              <div class="date-when">{d.quand}</div>
-              <div class="date-lieu serif">{d.lieu}</div>
-              <div class="date-ville">{d.ville}</div>
-              <span class="date-info">{d.info}</span>
-            </div>
-          </div>
-        ))}
+  {agenda.length > 0 && (
+    <section class="pad-sm">
+      <div class="wrap">
+        <h2 class="h-lg" style="margin-bottom:26px">Prochaines dates</h2>
+        <div class="grid grid-3">
+          {agenda.map((d) => {
+            const b = dateBadge(d.data.date);
+            return (
+              <div class="date card">
+                <div class="date-badge"><strong>{b.j}</strong><span>{b.m}</span></div>
+                <div>
+                  <div class="date-when">{d.data.heure ? `${b.jour} · ${d.data.heure}` : b.jour}</div>
+                  <div class="date-lieu serif">{d.data.lieu}</div>
+                  {d.data.ville && <div class="date-ville">{d.data.ville}</div>}
+                  {d.data.info && <span class="date-info">{d.data.info}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
   <section class="pad" style="padding-top:clamp(30px,5vw,60px)">
     <div class="wrap">
       <h2 class="h-lg" style="margin-bottom:26px">Le journal du groupe</h2>
-      <div class="grid grid-3">
-        {actus.map((a) => (
-          <article class="actu">
-            <div class="ph actu-ph"><span class="actu-tag">{a.tag}</span></div>
-            <div class="actu-date">{a.date}</div>
-            <h3 class="serif" style="font-size:1.3rem;margin:4px 0 8px">{a.titre}</h3>
-            <p style="color:var(--encre-soft)">{a.extrait}</p>
-          </article>
-        ))}
-      </div>
-      <p class="note-band">Ces articles sont des exemples. Bientôt, les membres du groupe pourront les publier eux-mêmes depuis l'espace d'administration.</p>
+      {actus.length > 0 ? (
+        <div class="grid grid-3">
+          {actus.map((a) => (
+            <article class="actu">
+              {a.data.image ? (
+                <img class="actu-img" src={a.data.image} alt={a.data.titre} loading="lazy" />
+              ) : (
+                <div class="ph actu-ph">{a.data.tag && <span class="actu-tag">{a.data.tag}</span>}</div>
+              )}
+              <div class="actu-date">{dateLongue(a.data.date)}{a.data.tag && a.data.image ? ` · ${a.data.tag}` : ''}</div>
+              <h3 class="serif" style="font-size:1.3rem;margin:4px 0 8px">{a.data.titre}</h3>
+              <p style="color:var(--encre-soft)">{extrait(a.body)}</p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="note-band">Aucun article pour le moment.</p>
+      )}
     </div>
   </section>
 
@@ -66,7 +88,6 @@ const agenda = [
 
 <style>
   .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
-  .page-hero .kicker{margin-bottom:16px}
   .page-hero h1{margin-bottom:18px}
   .date{display:flex;gap:18px;align-items:center}
   .date-badge{flex:0 0 auto;width:64px;height:64px;border-radius:14px;background:var(--terracotta);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
@@ -76,6 +97,7 @@ const agenda = [
   .date-lieu{font-size:1.15rem;margin:2px 0}
   .date-ville{font-size:.9rem;color:var(--encre-soft)}
   .date-info{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--iode);background:rgba(28,110,126,.1);padding:3px 10px;border-radius:999px}
+  .actu-img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--radius);display:block}
   .actu-ph{aspect-ratio:16/10;align-items:flex-start;justify-content:flex-start;padding:14px}
   .actu-tag{background:var(--terracotta);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 11px;border-radius:999px}
   .actu-date{color:var(--terracotta);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-top:14px}

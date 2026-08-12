@@ -1,0 +1,45 @@
+backend:
+  name: github
+  repo: theo-com-dev/flambarts-site
+  branch: main
+  # base_url : ajouté à l'étape « connexion » (serveur d'authentification GitHub).
+
+# Dossier où arrivent les photos ajoutées depuis l'interface.
+media_folder: public/img/uploads
+public_folder: /img/uploads
+
+locale: fr
+
+collections:
+  - name: agenda
+    label: Agenda — dates de concert
+    label_singular: date
+    description: Les prochaines dates du groupe.
+    folder: src/content/agenda
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{fields.lieu}}"
+    summary: "{{fields.date}} — {{fields.lieu}}"
+    sortable_fields: [date]
+    fields:
+      - { name: date, label: Date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false, format: "YYYY-MM-DD" }
+      - { name: heure, label: Heure, widget: string, required: false, hint: "Exemple : 18h00" }
+      - { name: lieu, label: Lieu / événement, widget: string, hint: "Exemple : Fête du Port" }
+      - { name: ville, label: Ville, widget: string, required: false, hint: "Exemple : Le Croisic (44)" }
+      - { name: info, label: Information, widget: string, required: false, hint: "Exemple : Entrée libre, Billetterie…" }
+      - { name: body, label: Détails (facultatif), widget: markdown, required: false }
+
+  - name: actualites
+    label: Actualités — articles
+    label_singular: article
+    description: Les nouvelles du groupe.
+    folder: src/content/actualites
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{fields.date}} — {{fields.titre}}"
+    sortable_fields: [date]
+    fields:
+      - { name: titre, label: Titre, widget: string }
+      - { name: date, label: Date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false, format: "YYYY-MM-DD" }
+      - { name: tag, label: Catégorie, widget: select, required: false, options: [Concert, Événement, Nouveauté, Coulisses] }
+      - { name: image, label: Photo (facultatif), widget: image, required: false }
+      - { name: body, label: Texte, widget: markdown }
