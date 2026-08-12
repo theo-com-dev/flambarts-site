@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
 
 const instruments = ['Accordéon diatonique', 'Accordéon chromatique', 'Guitare', 'Basse', 'Cajon', '2 voix'];
-const extraits = [
-  { titre: 'Le vieux', src: '/audio/le-vieux.mp3' },
-  { titre: '15 marins', src: '/audio/15-marins.mp3' },
-];
+
+// Morceaux à écouter — éditables depuis /admin (collection « musique »).
+const extraits = (await getCollection('musique'))
+  .map((e) => ({ titre: e.data.titre, src: e.data.fichier }))
+  .sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
 const agenda = [
   { j: '15', m: 'AOÛT', quand: 'Samedi · 18h00', lieu: 'Fête du Port', ville: 'Le Croisic (44)', info: 'Entrée libre' },
   { j: '21', m: 'AOÛT', quand: 'Vendredi · 20h30', lieu: 'Festival Chants de Marins', ville: 'Paimpol (22)', info: 'Billetterie' },
@@ -89,17 +91,19 @@ const galerie = Object.entries(galModules)
         <span class="kicker">À écouter</span>
         <h2 class="h-lg">Notre musique</h2>
         <p class="lead" style="margin:12px auto 0">
-          Deux morceaux à écouter tout de suite. Montez le son.
+          Quelques morceaux à écouter tout de suite. Montez le son.
         </p>
       </div>
-      <div class="grid grid-2">
-        {extraits.map((e) => (
-          <div class="track">
-            <div class="track-t serif">{e.titre}</div>
-            <audio controls preload="none" src={e.src}></audio>
-          </div>
-        ))}
-      </div>
+      {extraits.length > 0 && (
+        <div class="grid grid-2">
+          {extraits.map((e) => (
+            <div class="track">
+              <div class="track-t serif">{e.titre}</div>
+              <audio controls preload="none" src={e.src}></audio>
+            </div>
+          ))}
+        </div>
+      )}
       <p class="note">D'autres morceaux seront ajoutés au fil du temps.</p>
     </div>
   </section>

@@ -23,4 +23,13 @@ const actualites = defineCollection({
   }),
 });
 
-export const collections = { agenda, actualites };
+// Musique : les extraits audio de la page d'accueil (éditables depuis /admin).
+const musique = defineCollection({
+  type: 'content',
+  schema: z.object({
+    titre: z.string(),
+    fichier: z.string(),
+  }),
+});
+
+export const collections = { agenda, actualites, musique };

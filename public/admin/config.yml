@@ -44,3 +44,15 @@ collections:
       - { name: tag, label: Catégorie, widget: select, required: false, options: [Concert, Événement, Nouveauté, Coulisses] }
       - { name: image, label: Photo (facultatif), widget: image, required: false }
       - { name: body, label: Texte, widget: markdown }
+
+  - name: musique
+    label: Musique — morceaux à écouter
+    label_singular: morceau
+    description: Les extraits audio affichés sur la page d'accueil.
+    folder: src/content/musique
+    create: true
+    slug: "{{slug}}"
+    summary: "{{fields.titre}}"
+    fields:
+      - { name: titre, label: Titre du morceau, widget: string }
+      - { name: fichier, label: Fichier audio (MP3), widget: file, hint: "Choisissez un fichier .mp3 depuis votre appareil." }
