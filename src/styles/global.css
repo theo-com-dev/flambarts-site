@@ -97,8 +97,12 @@ header.nav{position:sticky;top:0;z-index:50;
 
 /* ---------- SECTIONS ---------- */
 section{position:relative;z-index:1}
-.pad{padding:clamp(56px,9vw,110px) 0}
-.pad-sm{padding:clamp(40px,6vw,72px) 0}
+.pad{padding:clamp(40px,7vw,96px) 0}
+.pad-sm{padding:clamp(28px,5vw,58px) 0}
+@media(max-width:640px){
+  .pad{padding:34px 0}
+  .pad-sm{padding:26px 0}
+}
 .center{text-align:center}
 .section-head{max-width:720px;margin:0 auto 42px}
 .section-head.center{text-align:center}
