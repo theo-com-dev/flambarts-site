@@ -64,7 +64,9 @@ collections:
     folder: src/content/galerie
     create: true
     slug: "photo-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
-    summary: "{{fields.image}}"
+    # Emplacement des photos de la galerie (pour l'aperçu dans le back-office).
+    media_folder: "/public/img/galerie"
+    public_folder: "/img/galerie"
     fields:
       - { name: image, label: Photo, widget: image, hint: "Choisissez une photo depuis votre appareil (elle sera compressée automatiquement)." }
       - { name: legende, label: Légende (facultatif), widget: string, required: false }
