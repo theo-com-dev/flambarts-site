@@ -56,3 +56,15 @@ collections:
     fields:
       - { name: titre, label: Titre du morceau, widget: string }
       - { name: fichier, label: Fichier audio (MP3), widget: file, hint: "Choisissez un fichier .mp3 depuis votre appareil." }
+
+  - name: galerie
+    label: Galerie photo
+    label_singular: photo
+    description: Les photos du carrousel de la page d'accueil.
+    folder: src/content/galerie
+    create: true
+    slug: "photo-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{fields.image}}"
+    fields:
+      - { name: image, label: Photo, widget: image, hint: "Choisissez une photo depuis votre appareil (elle sera compressée automatiquement)." }
+      - { name: legende, label: Légende (facultatif), widget: string, required: false }

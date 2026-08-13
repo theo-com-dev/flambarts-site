@@ -19,11 +19,10 @@ const prestations = [
   { ico: 'building', titre: "Événements d'entreprise", txt: "Séminaires, inaugurations, soirées clients. Un moment qui change des discours et fait chanter les équipes." },
   { ico: 'bunting', titre: 'Fêtes locales & maritimes', txt: "Fêtes de la musique, courses à la voile, 14 juillet. Sur scène, avec le répertoire qui fait lever la foule." },
 ];
-// Galerie automatique : dépose des images dans src/assets/galerie/ et elles apparaissent ici.
-const galModules = import.meta.glob('../assets/galerie/*.{jpg,jpeg,png,webp}', { eager: true });
-const galerie = Object.entries(galModules)
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(([, m]) => m.default);
+// Galerie — éditable depuis /admin (collection « galerie »).
+const galerie = (await getCollection('galerie'))
+  .sort((a, b) => a.id.localeCompare(b.id))
+  .map((e) => ({ src: e.data.image, alt: e.data.legende || 'Les Flambarts en concert' }));
 ---
 <Base active="accueil">
 
@@ -71,7 +70,7 @@ const galerie = Object.entries(galModules)
     <div class="gal-carousel" role="region" aria-label="Photos des Flambarts">
       {galerie.map((p, i) => (
         <button class="gal-thumb" data-full={p.src} type="button" aria-label={`Agrandir la photo ${i + 1} sur ${galerie.length}`}>
-          <img src={p.src} width={p.width} height={p.height} alt="Les Flambarts en concert" loading="lazy" />
+          <img src={p.src} alt={p.alt} loading="lazy" width="600" height="600" />
         </button>
       ))}
     </div>

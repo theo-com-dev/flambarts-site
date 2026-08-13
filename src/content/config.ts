@@ -32,4 +32,13 @@ const musique = defineCollection({
   }),
 });
 
-export const collections = { agenda, actualites, musique };
+// Galerie : les photos du carrousel de l'accueil (éditables depuis /admin).
+const galerie = defineCollection({
+  type: 'content',
+  schema: z.object({
+    image: z.string(),
+    legende: z.string().optional(),
+  }),
+});
+
+export const collections = { agenda, actualites, musique, galerie };
