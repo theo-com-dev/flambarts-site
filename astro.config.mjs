@@ -1,8 +1,15 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build
 export default defineConfig({
-  site: 'https://lesflambarts.fr',
-  // Pages statiques : sortie 100% HTML, hébergement gratuit sur Vercel.
+  // URL publique du site (à passer sur le vrai domaine quand il sera acheté).
+  site: 'https://flambarts.vercel.app',
   output: 'static',
+  integrations: [
+    sitemap({
+      // On n'indexe pas la page de remerciement.
+      filter: (page) => !page.includes('/merci'),
+    }),
+  ],
 });

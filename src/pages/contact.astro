@@ -1,6 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+
+const faq = [
+  { q: 'Combien de musiciens êtes-vous ?', r: 'Nous sommes sept musiciens : guitare, deux accordéons, basse, cajon et deux voix.' },
+  { q: 'Faut-il prévoir une sonorisation ?', r: 'Non. Nous sommes autonomes en son et matériel : une simple prise secteur suffit.' },
+  { q: 'Où vous déplacez-vous ?', r: "Nous sommes basés à Herbignac (44) et jouons sur la presqu'île guérandaise, en Bretagne et aux alentours." },
+  { q: 'Pour quels événements jouez-vous ?', r: "Restaurants et bars, fêtes locales et maritimes, événements d'entreprise, soirées caritatives et fêtes privées." },
+  { q: 'Combien de temps dure une prestation ?', r: "En général deux parties d'environ 45 minutes avec un entracte, à adapter selon votre événement." },
+  { q: 'Comment réserver une date ?', r: 'Écrivez-nous via le formulaire ci-dessus ou appelez le 06 14 84 35 88 : on répond sous 48 h.' },
+];
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.r },
+  })),
+};
 ---
 <Base active="contact" title="Contact" description="Une question sur le groupe, envie de nous programmer ou juste de nous dire bonjour ? Écrivez aux Flambarts.">
 
@@ -9,7 +27,7 @@ import Icon from '../components/Icon.astro';
       <h1 class="h-xl">Contact</h1>
       <p class="lead">
         Une question sur le groupe, envie de nous voir jouer près de chez vous, ou juste de nous
-        dire bonjour&nbsp;? Écrivez-nous, on vous répond.
+        dire bonjour&nbsp;? Écrivez-nous, <strong>on vous répond sous 48&nbsp;h</strong>.
       </p>
     </div>
   </section>
@@ -26,6 +44,7 @@ import Icon from '../components/Icon.astro';
         <form action="https://api.web3forms.com/submit" method="POST" class="form">
           <input type="hidden" name="access_key" value="VOTRE_CLE_WEB3FORMS" />
           <input type="hidden" name="subject" value="Nouveau message depuis le site Les Flambarts" />
+          <input type="hidden" name="redirect" value="https://flambarts.vercel.app/merci" />
           <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
 
           <div class="row">
@@ -83,6 +102,22 @@ import Icon from '../components/Icon.astro';
     </div>
   </section>
 
+  <section class="pad-sm faq-sec">
+    <div class="wrap">
+      <h2 class="h-lg" style="margin-bottom:24px">Questions fréquentes</h2>
+      <div class="faq-list">
+        {faq.map((f) => (
+          <details class="faq-item">
+            <summary>{f.q}</summary>
+            <p>{f.r}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
 </Base>
 
 <style>
@@ -106,4 +141,12 @@ import Icon from '../components/Icon.astro';
   .ci{color:var(--terracotta);flex:0 0 auto;margin-top:2px}
   .contact-line small{color:var(--encre-soft)}
   .side-note{background:var(--marine);color:#eaf1f4}
+  .faq-sec{background:var(--creme-2)}
+  .faq-list{max-width:760px}
+  .faq-item{background:#fff;border:1px solid rgba(42,32,24,.08);border-radius:12px;margin-bottom:12px;padding:0 18px}
+  .faq-item summary{cursor:pointer;font-weight:600;font-size:1.05rem;padding:16px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{content:"+";color:var(--terracotta);font-size:1.4rem;font-weight:400;flex:0 0 auto}
+  .faq-item[open] summary::after{content:"−"}
+  .faq-item p{color:var(--encre-soft);padding:0 0 16px;margin:0;line-height:1.6}
 </style>

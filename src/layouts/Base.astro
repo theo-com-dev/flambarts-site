@@ -1,12 +1,12 @@
 ---
 import '../styles/global.css';
 
-const { title, description, active } = Astro.props;
+const { title, description, active, breadcrumb, ogImage } = Astro.props;
 const pageTitle = title
   ? `${title} · Les Flambarts`
-  : 'Les Flambarts · Chants marins & ambiance bord de mer';
+  : 'Les Flambarts · Groupe de chants marins à Herbignac (44)';
 const desc = description ??
-  "Les Flambarts, 7 musiciens de chants marins d'Herbignac. Refrains à reprendre en chœur, 100 % bonne humeur, pour vos restaurants, événements, fêtes et soirées caritatives.";
+  "Les Flambarts, 7 musiciens de chants marins d'Herbignac (44). Refrains à reprendre en chœur, pour vos restaurants, événements, fêtes et soirées caritatives en Bretagne.";
 
 const nav = [
   { href: '/', label: 'Accueil', key: 'accueil' },
@@ -21,6 +21,44 @@ const social = {
   youtube: 'https://www.youtube.com/@LesFlambarts',
   facebook: 'https://www.facebook.com/p/Les-Flambarts-61557394624239/',
 };
+
+const site = Astro.site?.href.replace(/\/$/, '') ?? '';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage ?? '/og-image.jpg', Astro.site).href;
+
+// Fil d'Ariane : libellé passé explicitement ou déduit de l'onglet actif.
+const crumbLabel = breadcrumb ?? nav.find((n) => n.key === active)?.label;
+const showCrumb = crumbLabel && active !== 'accueil';
+
+// Données structurées (Google) — le groupe de musique.
+const musicGroupSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicGroup',
+  name: 'Les Flambarts',
+  genre: 'Chants marins',
+  url: site,
+  logo: `${site}/img/logo.jpg`,
+  image: ogImageUrl,
+  email: 'lesflambarts@gmail.com',
+  telephone: '+33614843588',
+  areaServed: 'Bretagne',
+  sameAs: [social.youtube, social.facebook],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Herbignac',
+    postalCode: '44410',
+    addressRegion: 'Loire-Atlantique',
+    addressCountry: 'FR',
+  },
+};
+const breadcrumbSchema = showCrumb && {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Accueil', item: site + '/' },
+    { '@type': 'ListItem', position: 2, name: crumbLabel, item: canonical },
+  ],
+};
 ---
 <!DOCTYPE html>
 <html lang="fr">
@@ -29,9 +67,27 @@ const social = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{pageTitle}</title>
   <meta name="description" content={desc} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" href="/img/logo.jpg" />
+  <meta name="theme-color" content="#123A54" />
+  <meta name="author" content="Les Flambarts" />
+  <!-- Partage réseaux sociaux -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Les Flambarts" />
+  <meta property="og:locale" content="fr_FR" />
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={desc} />
-  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={desc} />
+  <meta name="twitter:image" content={ogImageUrl} />
+  <!-- Données structurées -->
+  <script type="application/ld+json" set:html={JSON.stringify(musicGroupSchema)} />
+  {breadcrumbSchema && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -55,6 +111,15 @@ const social = {
   </header>
 
   <main>
+    {showCrumb && (
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <div class="wrap">
+          <a href="/">Accueil</a>
+          <span class="sep" aria-hidden="true">›</span>
+          <span aria-current="page">{crumbLabel}</span>
+        </div>
+      </nav>
+    )}
     <slot />
   </main>
 
@@ -95,10 +160,20 @@ const social = {
       </div>
       <div class="ftr-bottom">
         <span>© {new Date().getFullYear()} Les Flambarts · Herbignac</span>
-        <span><a href="/mentions-legales">Mentions légales</a> · Chants marins &amp; ambiance bord de mer</span>
+        <span><a href="/mentions-legales">Mentions légales</a> · <a href="/politique-confidentialite">Confidentialité</a></span>
       </div>
     </div>
   </footer>
+
+  {active !== 'contact' && (
+    <div class="sticky-cta">
+      <a class="s-call" href="tel:+33614843588" aria-label="Appeler Les Flambarts">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.3a11 11 0 0 0 5 5l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 3.5 5.7 2 2 0 0 1 5.5 3.5Z"/></svg>
+        Appeler
+      </a>
+      <a class="s-msg" href="/contact">Nous contacter</a>
+    </div>
+  )}
 
   <script>
     const toggle = document.querySelector('.nav-toggle');

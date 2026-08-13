@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Message envoyé" breadcrumb="Message envoyé" description="Merci, votre message a bien été envoyé aux Flambarts.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <h1 class="h-xl">Merci, message bien reçu&nbsp;!</h1>
+      <p class="lead">
+        On a bien reçu votre message et on vous répond sous 48&nbsp;h. À très vite&nbsp;!
+      </p>
+      <div class="merci-cta">
+        <a class="btn btn-primary" href="/">Retour à l'accueil</a>
+        <a class="btn btn-ghost" href="/actualites">Voir nos prochaines dates</a>
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(56px,9vw,110px) 0}
+  .page-hero h1{margin-bottom:16px}
+  .merci-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+</style>

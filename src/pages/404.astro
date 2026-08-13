@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+
+const liens = [
+  { href: '/', label: 'Accueil' },
+  { href: '/le-groupe', label: 'Le groupe' },
+  { href: '/prestations', label: 'Prestations' },
+  { href: '/actualites', label: 'Actualités' },
+  { href: '/contact', label: 'Contact' },
+];
+---
+<Base title="Page introuvable" breadcrumb="Page introuvable" description="Cette page n'existe pas ou a été déplacée.">
+
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="err-code">404</p>
+      <h1 class="h-xl">Page introuvable</h1>
+      <p class="lead">La page que vous cherchez n'existe pas ou a été déplacée.</p>
+    </div>
+  </section>
+
+  <section class="pad-sm">
+    <div class="wrap">
+      <p style="margin-bottom:20px;color:var(--encre-soft)">Voici les pages principales du site :</p>
+      <div class="grid grid-3">
+        {liens.map((l) => (
+          <a class="card link-card" href={l.href}>{l.label}</a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .err-code{font-family:var(--serif);font-size:clamp(3rem,10vw,5rem);color:var(--terracotta);line-height:1;margin-bottom:6px}
+  .link-card{font-family:var(--serif);font-size:1.2rem;text-align:center;transition:transform .15s,box-shadow .2s,color .15s}
+  .link-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);color:var(--terracotta)}
+</style>

@@ -140,4 +140,23 @@ footer.ftr .wrap{padding-top:56px;padding-bottom:30px}
 .ftr-bottom{border-top:1px solid rgba(255,255,255,.13);margin-top:40px;padding-top:22px;
   display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.85rem;color:#9fc0cf}
 
+/* ---------- FIL D'ARIANE ---------- */
+.breadcrumb{padding:14px 0 0}
+.breadcrumb .wrap{font-size:.85rem;color:var(--encre-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.breadcrumb a{color:var(--terracotta)}
+.breadcrumb a:hover{text-decoration:underline}
+.breadcrumb .sep{opacity:.5}
+
+/* ---------- BOUTON STICKY MOBILE ---------- */
+.sticky-cta{display:none}
+@media(max-width:768px){
+  .sticky-cta{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:60;padding:10px 12px;
+    background:rgba(251,246,236,.97);backdrop-filter:blur(8px);border-top:1px solid rgba(42,32,24,.1)}
+  .sticky-cta a{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 10px;
+    border-radius:12px;font-weight:700;font-size:.95rem}
+  .sticky-cta .s-call{background:#fff;border:1.5px solid rgba(42,32,24,.18);color:var(--encre)}
+  .sticky-cta .s-msg{background:var(--terracotta);color:#fff}
+  body{padding-bottom:70px}
+}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
