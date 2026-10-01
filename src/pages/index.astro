@@ -359,75 +359,54 @@ const galerie = (await getCollection('galerie'))
     let turning = false, lastA = 0;
     const max = () => car.scrollWidth - car.clientWidth;
 
-    // Corde détendue de chaque côté de la barre : elle pend un peu, défile avec les photos,
-    // et des nœuds se font quand on avance dans la galerie, se défont quand on revient.
+    // Une seule corde : elle part du bord gauche, passe derrière la barre, et avance vers la droite
+    // à mesure qu'on avance dans les photos. Arrivée au bout, elle s'enroule sur elle-même en UN nœud.
+    // On revient en arrière : elle se déroule et recule.
     const NS = 'http://www.w3.org/2000/svg';
-    const KNOTS = 3; // par côté
-    const WAVE = 26, WAVELEN = 230; // ondulation de la corde (vers le haut et le bas)
-    const ropeParts = [];
+    const WAVE = 18, WAVELEN = 230;
     const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+    let ropeLayers = null;
     if (rope) {
-      for (const side of [-1, 1]) {
-        const g = mk('g', {}, rope);
-        const outline = mk('path', { fill: 'none', stroke: '#241A12', 'stroke-width': 15, 'stroke-linecap': 'round' }, g);
-        const body = mk('path', { fill: 'none', stroke: '#D6A15E', 'stroke-width': 10, 'stroke-linecap': 'round' }, g);
-        const twist = mk('path', { fill: 'none', stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' }, g);
-        const knots = [];
-        for (let k = 0; k < KNOTS; k++) {
-          const kg = mk('g', {}, g);
-          // nœud bien serré : une boucle fermée au-dessus, la corde qui ressort croisée dessous
-          const strand = (d, w) => {
-            mk('path', { d, fill: 'none', stroke: '#241A12', 'stroke-width': w + 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, kg);
-            mk('path', { d, fill: 'none', stroke: '#D6A15E', 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, kg);
-            mk('path', { d, fill: 'none', stroke: '#8A5A2B', 'stroke-width': w, 'stroke-dasharray': '2.5 6' }, kg);
-          };
-          strand('M-26 4 C-10 4 -6 -2 -2 -10 C4 -26 -22 -40 -26 -22 C-30 -6 -4 2 12 -2 L30 -4', 10);
-          strand('M-30 -6 C-16 -2 -10 8 4 12 C14 15 22 8 30 6', 10);
-          mk('ellipse', { cx: -8, cy: 0, rx: 15, ry: 12, fill: '#C9934F', stroke: '#241A12', 'stroke-width': 4 }, kg);
-          strand('M-17 -7 L1 7', 6);
-          strand('M-17 7 L1 -7', 6);
-          knots.push(kg);
-        }
-        ropeParts.push({ side, outline, body, twist, knots });
-      }
+      const defs = mk('defs', {}, rope);
+      const mask = mk('mask', { id: 'corde-visible', maskUnits: 'userSpaceOnUse' }, defs);
+      const reveal = mk('path', { fill: 'none', stroke: '#fff', 'stroke-width': 30, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, mask);
+      const g = mk('g', { mask: 'url(#corde-visible)' }, rope);
+      const outline = mk('path', { fill: 'none', stroke: '#241A12', 'stroke-width': 15, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      const body = mk('path', { fill: 'none', stroke: '#D6A15E', 'stroke-width': 10, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      const twist = mk('path', { fill: 'none', stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' }, g);
+      ropeLayers = { reveal, outline, body, twist };
     }
     function drawRope() {
-      if (!rope || !helm) return;
+      if (!ropeLayers || !helm) return;
       const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2;
       rope.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      const hub = helm.clientWidth * 0.16;
-      const p = max() > 0 ? car.scrollLeft / max() : 0;
-      const sag = 30 - 12 * p; // la corde se raccourcit un peu quand les nœuds se font
-      const phase = car.scrollLeft / 90; // les vagues de la corde avancent avec les photos
-      for (const part of ropeParts) {
-        const x0 = part.side < 0 ? -10 : W + 10;
-        const x1 = W / 2 + part.side * hub;
-        const n = Math.max(12, Math.round(Math.abs(x1 - x0) / 8));
-        let d = '';
-        for (let i = 0; i <= n; i++) {
-          const u = i / n;
-          const x = x0 + (x1 - x0) * u;
-          const base = (cy - 16) + (16 + sag * 1.6) * 4 * u * (1 - u) + 16 * u * u;
-          const env = Math.sin(Math.PI * Math.min(1, u * 1.15)); // calme aux extrémités
-          const y = base + WAVE * env * Math.sin((Math.abs(x - x1) / WAVELEN) * Math.PI * 2 - part.side * phase);
-          d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
-        }
-        part.outline.setAttribute('d', d); part.body.setAttribute('d', d); part.twist.setAttribute('d', d);
-        part.twist.setAttribute('stroke-dashoffset', String(part.side * car.scrollLeft * 0.6));
-        const len = part.body.getTotalLength();
-        part.knots.forEach((kg, k) => {
-          const t = (k + 1) / (KNOTS + 1);
-          const at = part.body.getPointAtLength(len * t);
-          const nx = part.body.getPointAtLength(Math.min(len, len * t + 2));
-          const ang = Math.atan2(nx.y - at.y, nx.x - at.x) * 180 / Math.PI;
-          // ordre : les nœuds se font des bords vers la barre, en alternant les côtés
-          const order = k * 2 + (part.side < 0 ? 0 : 1);
-          let sc = Math.min(1, Math.max(0, p * KNOTS * 2 - order));
-          sc = sc * sc * (3 - 2 * sc);
-          kg.setAttribute('transform', `translate(${at.x} ${at.y}) rotate(${ang + (1 - sc) * 220}) scale(${sc * 1.25})`);
-          kg.style.opacity = sc < 0.02 ? '0' : '1';
-        });
+      const p = max() > 0 ? Math.min(1, car.scrollLeft / max()) : 0;
+      const phase = car.scrollLeft / 90;
+      const xHub = W / 2;
+      const xKnot = Math.min(W - 120, W * 0.82);
+      // 1) de la gauche jusqu'au nœud, en ondulant (calme près des extrémités)
+      let d = '';
+      const x0 = -10, n = Math.round((xKnot - x0) / 8);
+      for (let i = 0; i <= n; i++) {
+        const u = i / n, x = x0 + (xKnot - x0) * u;
+        const env = Math.sin(Math.PI * u) * Math.min(1, Math.abs(x - xHub) / 60);
+        const y = cy + 6 + WAVE * env * Math.sin(((x - x0) / WAVELEN) * Math.PI * 2 - phase);
+        d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
       }
+      // 2) le nœud : la corde fait une boucle fermée, repasse sur elle-même, puis une courte queue
+      // boucle vers le bas (sous la corde) pour ne pas se mêler à la barre de défilement des photos
+      const k = xKnot, r = 40, ky = cy + 6;
+      d += ` C${k + r * 1.4} ${ky} ${k + r * 1.4} ${ky + r * 1.9} ${k} ${ky + r * 1.9}`;
+      d += ` C${k - r * 1.5} ${ky + r * 1.9} ${k - r * 1.3} ${ky - r * 0.5} ${k + r * 0.4} ${ky - r * 0.45}`;
+      d += ` C${k + r * 1.2} ${ky - r * 0.42} ${k + r * 1.9} ${ky - r * 0.1} ${k + r * 2.8} ${ky + r * 0.7}`;
+      for (const el of [ropeLayers.reveal, ropeLayers.outline, ropeLayers.body, ropeLayers.twist]) el.setAttribute('d', d);
+      ropeLayers.twist.setAttribute('stroke-dashoffset', String(-car.scrollLeft * 0.6));
+      // longueur visible : toujours jusqu'à la barre, puis on avance jusqu'au bout du nœud
+      const total = ropeLayers.body.getTotalLength();
+      let toHub = 0;
+      { const step = 6; while (toHub < total && ropeLayers.body.getPointAtLength(toHub).x < xHub + 10) toHub += step; }
+      const vis = toHub + (total - toHub) * p;
+      ropeLayers.reveal.setAttribute('stroke-dasharray', `${vis} ${total + 100}`);
     }
     addEventListener('resize', drawRope);
     requestAnimationFrame(drawRope);
@@ -565,7 +544,7 @@ const galerie = (await getCollection('galerie'))
   .helm-wrap{--helm:190px;display:flex;justify-content:center;position:relative;z-index:3;isolation:isolate;
     margin-top:calc(var(--helm) * -.3 - 20px);pointer-events:none}
   /* corde tressée qui traverse l'écran derrière la barre et défile avec les photos */
-  .rope{position:absolute;top:50%;left:50%;width:100vw;height:220px;transform:translate(-50%,-50%);z-index:-1;
+  .rope{position:absolute;top:50%;left:50%;width:100vw;height:240px;transform:translate(-50%,-50%);z-index:-1;
     overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(36,26,18,.18))}
   .helm{width:var(--helm);height:var(--helm);border-radius:50%;cursor:grab;touch-action:none;pointer-events:auto;
     filter:drop-shadow(6px 6px 0 var(--encre))}
