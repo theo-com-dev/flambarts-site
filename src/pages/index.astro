@@ -70,7 +70,7 @@ const galerie = (await getCollection('galerie'))
 
   <!-- ============ LES FLAMBARTS EN 35 SECONDES (vidéo de présentation) ============ -->
   <section class="pad-sm presentation has-decor" id="presentation">
-    <Decor name="guitare" side="right" top="58%" size={300} rot={18} out={64} />
+    <Decor name="guitare" side="right" top="56%" size={340} rot={18} out={56} />
     <div class="wrap pres-grid">
       <div class="pres-copy">
         <span class="kicker">En 35 secondes</span>
@@ -103,7 +103,7 @@ const galerie = (await getCollection('galerie'))
         <span class="kicker">En images</span>
         <h2 class="h-lg">Le groupe en photos</h2>
         <p class="lead" style="margin:12px auto 0">
-          Faites défiler, et cliquez sur une photo pour la voir en grand.
+          Tournez la barre (ou faites défiler), puis cliquez sur une photo pour la voir en grand.
         </p>
       </div>
     </div>
@@ -113,6 +113,46 @@ const galerie = (await getCollection('galerie'))
           <img src={p.src} alt={p.alt} loading="lazy" width="600" height="600" />
         </button>
       ))}
+    </div>
+    <!-- Barre à roue : la tourner fait défiler les photos (30 % sur les photos, 70 % dessous) -->
+    <div class="helm-wrap">
+      <div class="rope" aria-hidden="true"></div>
+      <div class="helm" role="slider" tabindex="0" aria-label="Barre à roue : tournez-la pour faire défiler les photos"
+        aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Début de la galerie">
+        <svg class="helm-svg" viewBox="-110 -110 220 220" aria-hidden="true">
+          <g class="helm-rot">
+            <g transform="rotate(0)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(45)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(90)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(135)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(180)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(225)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(270)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <g transform="rotate(315)"><rect x="-5" y="-104" width="10" height="70" rx="4" fill="#B97A3D" stroke="#241A12" stroke-width="3"/><rect x="-8" y="-108" width="16" height="26" rx="8" fill="#D6A15E" stroke="#241A12" stroke-width="3"/></g>
+            <circle r="66" fill="none" stroke="#241A12" stroke-width="20"/>
+            <circle r="66" fill="none" stroke="#D6A15E" stroke-width="13"/>
+            <circle r="66" fill="none" stroke="#A8763A" stroke-width="2" stroke-dasharray="6 9"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(0)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(0)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(45)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(45)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(90)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(90)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(135)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(135)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(180)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(180)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(225)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(225)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(270)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(270)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(315)" stroke="#241A12" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="-24" x2="0" y2="-58" transform="rotate(315)" stroke="#B97A3D" stroke-width="5" stroke-linecap="round"/>
+            <defs>
+              <pattern id="corde-enroulee" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-55)">
+                <rect width="9" height="9" fill="#D6A15E"/><rect width="3" height="9" fill="#B97A3D"/><rect x="3" width="2" height="9" fill="#8A5A2B"/>
+              </pattern>
+            </defs>
+            <circle r="36" fill="url(#corde-enroulee)" stroke="#241A12" stroke-width="3"/>
+            <circle r="30" fill="none" stroke="#8A5A2B" stroke-width="1.5" opacity=".7"/>
+            <circle r="24" fill="#C24E2C" stroke="#241A12" stroke-width="3.5"/>
+            <circle r="9" fill="#FBF6EC" stroke="#241A12" stroke-width="3"/>
+            <circle cx="0" cy="-92" r="4" fill="#C24E2C"/>
+          </g>
+        </svg>
+      </div>
     </div>
   </section>
 
@@ -125,7 +165,7 @@ const galerie = (await getCollection('galerie'))
 
   <!-- ============ EXTRAITS AUDIO ============ -->
   <section class="pad has-decor" id="extraits">
-    <Decor name="micro" side="left" top="50%" size={250} rot={-14} out={60} />
+    <Decor name="micro" side="left" top="50%" size={280} rot={16} out={52} />
     <div class="wrap">
       <div class="section-head center">
         <span class="kicker">À écouter</span>
@@ -175,7 +215,7 @@ const galerie = (await getCollection('galerie'))
 
   <!-- ============ AGENDA ============ -->
   <section class="pad has-decor" id="agenda">
-    <Decor name="basse" side="right" top="62%" size={240} rot={24} out={68} />
+    <Decor name="basse" side="right" top="62%" size={280} rot={24} out={62} />
     <div class="wrap">
       <div class="head-row">
         <div><span class="kicker">Agenda</span><h2 class="h-xl" style="margin-top:12px">Où nous voir bientôt</h2></div>
@@ -199,7 +239,7 @@ const galerie = (await getCollection('galerie'))
 
   <!-- ============ PRESTATIONS ============ -->
   <section class="pad prestations has-decor">
-    <Decor name="accordeon" side="left" top="52%" size={340} rot={-10} out={68} />
+    <Decor name="accordeon" side="left" top="50%" size={400} rot={-10} out={66} />
     <div class="wrap">
       <div class="section-head">
         <span class="kicker">Nos prestations</span>
@@ -296,6 +336,70 @@ const galerie = (await getCollection('galerie'))
     }
   }
 
+  // Galerie : flèches et glisser à la souris (la molette verticale ne fait pas défiler une liste horizontale).
+  const car = document.querySelector('.gal-carousel');
+  let dragged = false;
+  if (car) {
+    // Barre à roue : un tour complet = environ 7 photos. La barre et la corde suivent aussi le défilement au doigt.
+    const helm = document.querySelector('.helm');
+    const rot = helm?.querySelector('.helm-rot');
+    const PX_PER_DEG = 2100 / 360;
+    const rope = document.querySelector('.rope');
+    let turning = false, lastA = 0;
+    const max = () => car.scrollWidth - car.clientWidth;
+    const sync = () => {
+      if (!rot) return;
+      rot.style.transform = `rotate(${car.scrollLeft / PX_PER_DEG}deg)`;
+      if (rope) rope.style.backgroundPositionX = `${-car.scrollLeft * 0.6}px`;
+      const pct = max() > 0 ? Math.round((car.scrollLeft / max()) * 100) : 0;
+      helm.setAttribute('aria-valuenow', String(pct));
+      helm.setAttribute('aria-valuetext', pct <= 0 ? 'Début de la galerie' : pct >= 100 ? 'Fin de la galerie' : `Photos à ${pct} %`);
+    };
+    car.addEventListener('scroll', sync, { passive: true });
+    if (helm) {
+      const angle = (e) => { const r = helm.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; };
+      helm.addEventListener('pointerdown', (e) => {
+        turning = true; lastA = angle(e); helm.setPointerCapture(e.pointerId);
+        helm.classList.add('turning'); car.classList.add('steering');
+      });
+      helm.addEventListener('pointermove', (e) => {
+        if (!turning) return;
+        const a = angle(e); let d = a - lastA;
+        if (d > 180) d -= 360; if (d < -180) d += 360;
+        lastA = a;
+        car.scrollLeft = Math.min(max(), Math.max(0, car.scrollLeft + d * PX_PER_DEG));
+        sync();
+      });
+      const stop = () => { turning = false; helm.classList.remove('turning'); car.classList.remove('steering'); };
+      helm.addEventListener('pointerup', stop);
+      helm.addEventListener('pointercancel', stop);
+      // au clavier : flèches = un huitième de tour, Début / Fin
+      helm.addEventListener('keydown', (e) => {
+        const k = e.key;
+        if (k === 'ArrowRight' || k === 'ArrowUp') car.scrollBy({ left: 45 * PX_PER_DEG * 2, behavior: 'smooth' });
+        else if (k === 'ArrowLeft' || k === 'ArrowDown') car.scrollBy({ left: -45 * PX_PER_DEG * 2, behavior: 'smooth' });
+        else if (k === 'Home') car.scrollTo({ left: 0, behavior: 'smooth' });
+        else if (k === 'End') car.scrollTo({ left: max(), behavior: 'smooth' });
+        else return;
+        e.preventDefault();
+      });
+    }
+    let down = false, x0 = 0, s0 = 0;
+    car.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      down = true; dragged = false; x0 = e.clientX; s0 = car.scrollLeft;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 6) { dragged = true; car.classList.add('dragging'); }
+      if (dragged) car.scrollLeft = s0 - dx;
+    });
+    window.addEventListener('pointerup', () => { down = false; car.classList.remove('dragging'); });
+    // un glissé ne doit pas ouvrir la photo
+    car.addEventListener('click', (e) => { if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; } }, true);
+  }
+
   // Galerie : lightbox au clic (navigation clavier + boutons).
   const lb = document.getElementById('lightbox');
   if (lb) {
@@ -368,6 +472,28 @@ const galerie = (await getCollection('galerie'))
     padding:6px max(26px,calc((100% - var(--maxw))/2 + 26px)) 20px;
     scrollbar-width:thin;scrollbar-color:var(--terracotta) transparent;-webkit-overflow-scrolling:touch}
   .gal-carousel::-webkit-scrollbar{height:8px}
+  .gal-carousel{cursor:grab}
+  .gal-carousel.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+  .gal-carousel.dragging .gal-thumb{pointer-events:none}
+  .gal-thumb img{-webkit-user-drag:none;user-select:none}
+  /* barre à roue : 30 % posée sur les photos, 70 % dessous */
+  .helm-wrap{--helm:190px;display:flex;justify-content:center;position:relative;z-index:3;isolation:isolate;
+    margin-top:calc(var(--helm) * -.3 - 20px);pointer-events:none}
+  /* corde tressée qui traverse l'écran derrière la barre et défile avec les photos */
+  .rope{position:absolute;top:50%;left:50%;width:100vw;height:16px;transform:translate(-50%,-50%);z-index:-1;
+    border-top:2px solid var(--encre);border-bottom:2px solid var(--encre);
+    background:repeating-linear-gradient(-55deg,#D6A15E 0 6px,#B97A3D 6px 9px,#8A5A2B 9px 11px);
+    box-shadow:0 4px 0 rgba(36,26,18,.18);pointer-events:none}
+  .helm{width:var(--helm);height:var(--helm);border-radius:50%;cursor:grab;touch-action:none;pointer-events:auto;
+    filter:drop-shadow(6px 6px 0 var(--encre))}
+  .helm.turning{cursor:grabbing}
+  .helm:focus-visible{outline:3px solid var(--terracotta);outline-offset:6px}
+  .helm-svg{width:100%;height:100%;display:block;overflow:visible}
+  .helm-rot{transform-box:fill-box;transform-origin:center;transition:transform .08s linear}
+  .helm.turning .helm-rot{transition:none}
+  .gal-carousel.steering{scroll-snap-type:none}
+  @media(hover:hover){.helm:hover .helm-rot{transform-origin:center}}
+  @media(max-width:640px){.helm-wrap{--helm:150px}}
   .gal-carousel::-webkit-scrollbar-thumb{background:var(--terracotta);border-radius:999px}
   .gal-thumb{flex:0 0 auto;width:280px;height:280px;padding:0;border:2px solid var(--encre);border-radius:var(--r);overflow:hidden;
     cursor:pointer;scroll-snap-align:center;background:var(--placeholder);
@@ -477,10 +603,10 @@ const galerie = (await getCollection('galerie'))
 .cta-final{background:var(--creme) url(/img/carte-marine.svg) center/1400px auto no-repeat;border-top:0}
 .cta-final > .wrap{max-width:860px;background:var(--terracotta);border:2px solid var(--encre);
   border-radius:var(--r);box-shadow:8px 8px 0 var(--encre);padding:clamp(36px,5vw,58px) clamp(22px,4vw,48px);
-  transform:rotate(-1.2deg);animation:affiche-tangue 7s ease-in-out infinite}
+  transform:rotate(-3deg);animation:affiche-tangue 6s ease-in-out infinite}
 /* au survol ou au clavier, l'affiche se pose : boutons parfaitement immobiles pour cliquer */
 .cta-final > .wrap:hover,.cta-final > .wrap:focus-within{animation-play-state:paused}
 @keyframes affiche-tangue{
-  0%,100%{transform:translateY(0) rotate(-1.2deg)}
-  50%{transform:translateY(-5px) rotate(-.4deg)}}
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-8px) rotate(1deg)}}
 </style>

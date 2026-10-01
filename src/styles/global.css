@@ -205,6 +205,6 @@ footer.ftr .wrap{padding-top:58px;padding-bottom:30px}
 .decor svg{animation:decor-tangue 9s ease-in-out infinite alternate}
 @keyframes decor-tangue{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
 /* il faut une marge sur les côtés pour ne pas passer sous le texte */
-@media(max-width:1279px){.decor{display:none}}
+@media(max-width:1399px){.decor{display:none}}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
