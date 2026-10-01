@@ -37,7 +37,7 @@ const musicGroupSchema = {
   name: 'Les Flambarts',
   genre: 'Chants marins',
   url: site,
-  logo: `${site}/img/logo.jpg`,
+  logo: `${site}/favicon-512.png`,
   image: ogImageUrl,
   email: 'lesflambarts@gmail.com',
   telephone: '+33614843588',
@@ -68,7 +68,12 @@ const breadcrumbSchema = showCrumb && {
   <title>{pageTitle}</title>
   <meta name="description" content={desc} />
   <link rel="canonical" href={canonical} />
-  <link rel="icon" href="/img/logo.jpg" />
+  <!-- Petit logo (onglet, résultats Google, écran d'accueil) : le rond et le bateau seulement -->
+  <link rel="icon" href="/logo-bateau.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <meta name="theme-color" content="#123A54" />
   <meta name="author" content="Les Flambarts" />
   <!-- Partage réseaux sociaux -->
@@ -96,7 +101,7 @@ const breadcrumbSchema = showCrumb && {
   <header class="nav">
     <div class="wrap nav-in">
       <a class="brand" href="/">
-        <img class="mark" src="/img/logo.jpg" alt="Logo Les Flambarts" width="42" height="42" />
+        <img class="mark" src="/logo-bateau.svg" alt="Logo Les Flambarts" width="54" height="40" />
         <span>Les Flambarts</span>
       </a>
       <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">

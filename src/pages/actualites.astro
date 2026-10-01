@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Decor from '../components/Decor.astro';
 import { getCollection } from 'astro:content';
 
 const moisCourts = ['JANV', 'FÉVR', 'MARS', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
@@ -26,7 +27,8 @@ const extrait = (t: string) => {
 ---
 <Base active="actualites" title="Actualités" description="Les dernières nouvelles des Flambarts : concerts, dates à venir et coulisses.">
 
-  <section class="page-hero">
+  <section class="page-hero has-decor">
+    <Decor name="micro" side="right" top="88%" size={210} rot={-16} out={12} />
     <div class="wrap">
       <h1 class="h-xl">Actualités</h1>
       <p class="lead">
@@ -87,19 +89,21 @@ const extrait = (t: string) => {
 </Base>
 
 <style>
-  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero{background:var(--creme);border-bottom:2px solid var(--encre);padding:clamp(48px,7vw,88px) 0}
   .page-hero h1{margin-bottom:18px}
   .date{display:flex;gap:18px;align-items:center}
-  .date-badge{flex:0 0 auto;width:64px;height:64px;border-radius:14px;background:var(--terracotta);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-  .date-badge strong{font-family:var(--serif);font-size:1.5rem}
-  .date-badge span{font-size:.7rem;letter-spacing:.08em;margin-top:2px}
-  .date-when{font-size:.82rem;color:var(--encre-soft);font-weight:600}
-  .date-lieu{font-size:1.15rem;margin:2px 0}
+  .date-badge{flex:0 0 auto;width:64px;height:64px;border-radius:var(--r);background:var(--terracotta);color:#fff;
+    border:2px solid var(--encre);box-shadow:var(--hard-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .date-badge strong{font-family:var(--serif);font-weight:900;font-size:1.5rem}
+  .date-badge span{font-size:.68rem;letter-spacing:.1em;margin-top:3px;font-weight:700}
+  .date-when{font-size:.78rem;color:var(--encre-soft);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .date-lieu{font-size:1.2rem;margin:2px 0;font-weight:600}
   .date-ville{font-size:.9rem;color:var(--encre-soft)}
-  .date-info{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--iode);background:rgba(28,110,126,.1);padding:3px 10px;border-radius:999px}
-  .actu-img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--radius);display:block}
+  .date-info{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--iode);border:1.5px solid var(--iode);padding:4px 10px;border-radius:var(--r-xs)}
+  .actu{transition:transform .16s ease,box-shadow .16s ease}
+  .actu-img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--r);border:2px solid var(--encre);display:block}
   .actu-ph{aspect-ratio:16/10;align-items:flex-start;justify-content:flex-start;padding:14px}
-  .actu-tag{background:var(--terracotta);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 11px;border-radius:999px}
-  .actu-date{color:var(--terracotta);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-top:14px}
-  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;max-width:70ch;margin-left:auto;margin-right:auto}
+  .actu-tag{background:var(--terracotta);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.06em;padding:5px 11px;border-radius:var(--r-xs)}
+  .actu-date{color:var(--terracotta);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-top:14px}
+  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;font-style:italic;max-width:70ch;margin-left:auto;margin-right:auto}
 </style>

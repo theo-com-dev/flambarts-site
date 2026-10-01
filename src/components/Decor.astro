@@ -1,0 +1,124 @@
+---
+// Instruments décoratifs dessinés « à l'encre », posés à moitié hors de la page sur un bord.
+// Usage : <Decor name="accordeon" side="left" top="40%" size={380} rot={-12} />
+// Le parent doit avoir la classe « has-decor ». Purement décoratif (aria-hidden), masqué sur téléphone.
+interface Props {
+  name: 'accordeon' | 'basse' | 'micro' | 'guitare';
+  side?: 'left' | 'right';
+  top?: string;
+  size?: number;
+  rot?: number;
+  out?: number; // part de l'instrument cachée hors de la page (en %)
+}
+const { name, side = 'right', top = '50%', size = 360, rot = 0, out = 62 } = Astro.props;
+const id = `d${Math.random().toString(36).slice(2, 8)}`;
+const style = `--top:${top};--size:${size}px;--rot:${rot}deg;--out:${out}%`;
+
+const C = {
+  encre: '#241A12', terra: '#C24E2C', orange: '#EE8A3D', marine: '#123A54',
+  creme: '#FBF6EC', sable: '#F0E3CD', bois: '#D6A15E', metal: '#CFC6B6',
+};
+---
+<span class={`decor decor-${side}`} style={style} aria-hidden="true">
+  {name === 'accordeon' && (
+    <svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
+      <g stroke={C.encre} stroke-width="4" stroke-linejoin="round">
+        <rect x="118" y="44" width="184" height="232" fill={C.marine} />
+        {Array.from({ length: 9 }, (_, i) => (
+          <line x1={138 + i * 20} y1="44" x2={138 + i * 20} y2="276" stroke={C.creme} stroke-width="3" />
+        ))}
+        <path d={`M118 44 ${Array.from({ length: 9 }, (_, i) => `L${128 + i * 20} 34 L${138 + i * 20} 44`).join(' ')} L302 44`} fill={C.marine} />
+        <path d={`M118 276 ${Array.from({ length: 9 }, (_, i) => `L${128 + i * 20} 286 L${138 + i * 20} 276`).join(' ')} L302 276`} fill={C.marine} />
+        <rect x="20" y="24" width="102" height="272" rx="12" fill={C.terra} />
+        <rect x="298" y="24" width="102" height="272" rx="12" fill={C.terra} />
+        <rect x="352" y="40" width="38" height="240" rx="4" fill={C.creme} />
+      </g>
+      {Array.from({ length: 7 }, (_, r) => [0, 1, 2].map((c) => (
+        <circle cx={44 + c * 26} cy={52 + r * 36 + (c % 2) * 14} r="8" fill={C.creme} stroke={C.encre} stroke-width="2.5" />
+      )))}
+      {Array.from({ length: 11 }, (_, k) => (
+        <line x1="352" y1={60 + k * 20} x2="390" y2={60 + k * 20} stroke={C.encre} stroke-width="2" />
+      ))}
+      {[0, 1, 3, 4, 5, 7, 8, 10].map((k) => (
+        <rect x="352" y={54 + k * 20} width="22" height="11" fill={C.encre} />
+      ))}
+      <circle cx="324" cy="160" r="16" fill="none" stroke={C.creme} stroke-width="3" />
+      <rect x="150" y="12" width="120" height="14" rx="7" fill={C.encre} />
+    </svg>
+  )}
+
+  {name === 'basse' && (
+    <svg viewBox="0 0 240 760" xmlns="http://www.w3.org/2000/svg">
+      <g stroke={C.encre} stroke-width="4" stroke-linejoin="round">
+        <path d="M96 30 L148 22 L156 120 L104 126 Z" fill={C.encre} />
+        <rect x="104" y="118" width="34" height="440" fill={C.bois} />
+        <path d="M58 520 C26 520 14 566 32 604 C46 634 18 666 30 704 C46 748 112 756 126 744 C142 756 208 748 218 706 C228 664 198 638 208 602 C220 562 208 520 176 526 C160 530 152 548 146 560 L98 560 C92 542 84 520 58 520 Z" fill={C.terra} />
+        <path d="M70 548 C56 566 60 594 74 610 C90 628 70 650 76 680 L120 690 L126 600 L104 572 Z" fill={C.creme} />
+        <rect x="92" y="604" width="58" height="18" rx="4" fill={C.encre} />
+        <rect x="96" y="690" width="52" height="16" rx="3" fill={C.metal} />
+      </g>
+      {Array.from({ length: 14 }, (_, i) => (
+        <line x1="104" y1={150 + i * 29} x2="138" y2={150 + i * 29} stroke={C.encre} stroke-width="2" />
+      ))}
+      {[0, 1, 2, 3].map((k) => (
+        <>
+          <circle cx={92} cy={44 + k * 22} r="7" fill={C.creme} stroke={C.encre} stroke-width="2.5" />
+          <line x1={110 + k * 7.5} y1="40" x2={112 + k * 6.5} y2="700" stroke={C.creme} stroke-width="1.6" />
+        </>
+      ))}
+    </svg>
+  )}
+
+  {name === 'micro' && (
+    <svg viewBox="0 0 220 560" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id={`${id}-g`}><rect x="44" y="34" width="132" height="230" rx="66" /></clipPath>
+      </defs>
+      <g stroke={C.encre} stroke-width="4" stroke-linejoin="round">
+        <rect x="102" y="290" width="16" height="230" fill={C.encre} />
+        <ellipse cx="110" cy="528" rx="80" ry="18" fill={C.encre} />
+        <path d="M30 150 C30 300 190 300 190 150" fill="none" stroke-width="10" />
+        <rect x="44" y="34" width="132" height="230" rx="66" fill={C.metal} />
+      </g>
+      <g clip-path={`url(#${id}-g)`} stroke={C.encre} stroke-width="2" opacity=".55">
+        {Array.from({ length: 16 }, (_, i) => (
+          <>
+            <line x1={20 + i * 16} y1="20" x2={-80 + i * 16} y2="280" />
+            <line x1={-60 + i * 16} y1="20" x2={40 + i * 16} y2="280" />
+          </>
+        ))}
+      </g>
+      <g stroke={C.encre} stroke-width="4">
+        <rect x="40" y="140" width="140" height="30" fill={C.terra} />
+        <rect x="44" y="34" width="132" height="230" rx="66" fill="none" />
+        <circle cx="30" cy="150" r="9" fill={C.creme} />
+        <circle cx="190" cy="150" r="9" fill={C.creme} />
+      </g>
+    </svg>
+  )}
+
+  {name === 'guitare' && (
+    <svg viewBox="0 0 300 760" xmlns="http://www.w3.org/2000/svg">
+      <g stroke={C.encre} stroke-width="4" stroke-linejoin="round">
+        <path d="M122 20 L178 20 L184 110 L116 110 Z" fill={C.encre} />
+        <rect x="132" y="104" width="36" height="330" fill={C.bois} />
+        <path d="M150 380 C95 380 70 410 78 455 C84 488 70 500 52 530 C20 585 40 690 150 730 C260 690 280 585 248 530 C230 500 216 488 222 455 C230 410 205 380 150 380 Z" fill={C.orange} />
+        <circle cx="150" cy="520" r="38" fill={C.encre} />
+        <rect x="112" y="628" width="76" height="16" rx="4" fill={C.encre} />
+      </g>
+      <circle cx="150" cy="520" r="46" fill="none" stroke={C.creme} stroke-width="4" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <line x1="132" y1={130 + i * 24} x2="168" y2={130 + i * 24} stroke={C.encre} stroke-width="2" />
+      ))}
+      {Array.from({ length: 6 }, (_, k) => (
+        <line x1={136 + k * 5.6} y1="30" x2={136 + k * 5.6} y2="636" stroke={C.creme} stroke-width="1.4" />
+      ))}
+      {[0, 1, 2].map((k) => (
+        <>
+          <circle cx="108" cy={38 + k * 26} r="7" fill={C.creme} stroke={C.encre} stroke-width="2.5" />
+          <circle cx="192" cy={38 + k * 26} r="7" fill={C.creme} stroke={C.encre} stroke-width="2.5" />
+        </>
+      ))}
+    </svg>
+  )}
+</span>

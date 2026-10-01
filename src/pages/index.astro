@@ -1,9 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import Decor from '../components/Decor.astro';
 import Icon from '../components/Icon.astro';
 import { getCollection } from 'astro:content';
 
 const instruments = ['Accordéon diatonique', 'Accordéon chromatique', 'Guitare', 'Basse', 'Cajon', '2 voix'];
+
+// Version de la vidéo du hero : à augmenter à chaque nouvelle vidéo pour que les navigateurs
+// ne gardent pas l'ancienne en mémoire.
+const heroV = '6';
 
 // Morceaux à écouter — éditables depuis /admin (collection « musique »).
 const extraits = (await getCollection('musique'))
@@ -15,9 +20,9 @@ const agenda = [
   { j: '05', m: 'SEPT', quand: 'Samedi · 17h00', lieu: 'Fête de la Mer', ville: 'La Turballe (44)', info: 'Entrée libre' },
 ];
 const prestations = [
-  { ico: 'glass', titre: 'Restaurants & bars', txt: "On passe entre les tables et on chante, sans couvrir les conversations. Vos clients restent, et ils reviennent." },
-  { ico: 'building', titre: "Événements d'entreprise", txt: "Séminaires, inaugurations, soirées clients. Un moment qui change des discours et fait chanter les équipes." },
-  { ico: 'bunting', titre: 'Fêtes locales & maritimes', txt: "Fêtes de la musique, courses à la voile, 14 juillet. Sur scène, avec le répertoire qui fait lever la foule." },
+  { n: '01', ico: 'glass', titre: 'Restaurants & bars', txt: "On passe entre les tables et on chante, sans couvrir les conversations. Vos clients restent, et ils reviennent." },
+  { n: '02', ico: 'building', titre: "Événements d'entreprise", txt: "Séminaires, inaugurations, soirées clients. Un moment qui change des discours et fait chanter les équipes." },
+  { n: '03', ico: 'bunting', titre: 'Fêtes locales & maritimes', txt: "Fêtes de la musique, courses à la voile, 14 juillet. Sur scène, avec le répertoire qui fait lever la foule." },
 ];
 // Galerie — éditable depuis /admin (collection « galerie »).
 const galerie = (await getCollection('galerie'))
@@ -29,15 +34,20 @@ const galerie = (await getCollection('galerie'))
   <!-- ============ HERO (scène animée) ============ -->
   <section class="hero">
     <div class="hero-scene" aria-hidden="true">
-      <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="/hero-poster.jpg">
-        <source src="/hero.mp4" type="video/mp4" />
+      <!-- Vidéo en arrière-plan, texte par-dessus (ordinateur comme téléphone).
+           Ordinateur : image entière (musiciens à droite). Téléphone : recadrage sur les musiciens, fichier plus léger. -->
+      <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster={`/hero-poster.jpg?v=${heroV}`}>
+        <source src={`/hero.webm?v=${heroV}`} type="video/webm" media="(min-width: 861px)" />
+        <source src={`/hero.mp4?v=${heroV}`} type="video/mp4" media="(min-width: 861px)" />
+        <source src={`/hero-mobile.webm?v=${heroV}`} type="video/webm" />
+        <source src={`/hero-mobile.mp4?v=${heroV}`} type="video/mp4" />
       </video>
     </div>
 
     <div class="wrap hero-in">
       <div class="hero-copy">
         <span class="kicker">Groupe de chants marins · Bretagne</span>
-        <h1 class="h-xl">Chants marins <span class="amp">&amp;</span> ambiance bord de mer</h1>
+        <h1 class="h-display">Chants marins <span class="amp">&amp;</span> ambiance bord de mer</h1>
         <p class="lead">
           Sept musiciens d'Herbignac qui reprennent les grands chants de marins, de « Santiano »
           à « Nous irons à Valparaiso ». Des refrains que toute la salle finit par chanter avec nous.
@@ -54,6 +64,36 @@ const galerie = (await getCollection('galerie'))
     </div>
 
     <div class="hero-badge"><strong>7</strong><span>musiciens · 100 % bonne humeur</span></div>
+  </section>
+
+  <div class="rule-wave" aria-hidden="true"></div>
+
+  <!-- ============ LES FLAMBARTS EN 35 SECONDES (vidéo de présentation) ============ -->
+  <section class="pad-sm presentation has-decor" id="presentation">
+    <Decor name="guitare" side="right" top="58%" size={300} rot={18} out={64} />
+    <div class="wrap pres-grid">
+      <div class="pres-copy">
+        <span class="kicker">En 35 secondes</span>
+        <h2 class="h-lg">Ce qu'on apporte à votre fête</h2>
+        <p class="lead">
+          Un groupe de chants marins qui fait chanter vos invités, du mariage à la soirée d'entreprise.
+        </p>
+        <ul class="pres-list">
+          <li><span aria-hidden="true">1</span>Concerts de chants marins</li>
+          <li><span aria-hidden="true">2</span>Animations déambulatoires</li>
+          <li><span aria-hidden="true">3</span>Chants à reprendre en chœur</li>
+        </ul>
+        <a class="btn btn-primary" href="/contact">Nous contacter</a>
+      </div>
+      <figure class="pres-video">
+        <video class="pres-player" muted loop playsinline webkit-playsinline preload="none"
+          poster="/presentation-poster.jpg" aria-label="Vidéo de présentation des Flambarts">
+          <source src="/presentation.webm" type="video/webm" />
+          <source src="/presentation.mp4" type="video/mp4" />
+        </video>
+        <button class="pres-sound" type="button" aria-pressed="false">Activer le son</button>
+      </figure>
+    </div>
   </section>
 
   <!-- ============ GALERIE PHOTO ============ -->
@@ -84,7 +124,8 @@ const galerie = (await getCollection('galerie'))
   </div>
 
   <!-- ============ EXTRAITS AUDIO ============ -->
-  <section class="pad" id="extraits">
+  <section class="pad has-decor" id="extraits">
+    <Decor name="micro" side="left" top="50%" size={250} rot={-14} out={60} />
     <div class="wrap">
       <div class="section-head center">
         <span class="kicker">À écouter</span>
@@ -133,49 +174,56 @@ const galerie = (await getCollection('galerie'))
   </section>
 
   <!-- ============ AGENDA ============ -->
-  <section class="pad" id="agenda">
+  <section class="pad has-decor" id="agenda">
+    <Decor name="basse" side="right" top="62%" size={240} rot={24} out={68} />
     <div class="wrap">
       <div class="head-row">
-        <div><span class="kicker">Agenda</span><h2 class="h-lg" style="margin-top:12px">Où nous voir bientôt</h2></div>
+        <div><span class="kicker">Agenda</span><h2 class="h-xl" style="margin-top:12px">Où nous voir bientôt</h2></div>
         <a class="btn btn-ghost" href="/actualites">Toutes les dates →</a>
       </div>
-      <div class="grid grid-3">
+      <ul class="date-list">
         {agenda.map((d) => (
-          <div class="date card">
+          <li class="date-row">
             <div class="date-badge"><strong>{d.j}</strong><span>{d.m}</span></div>
-            <div>
+            <div class="date-main">
               <div class="date-when">{d.quand}</div>
               <div class="date-lieu serif">{d.lieu}</div>
               <div class="date-ville">{d.ville}</div>
-              <span class="date-info">{d.info}</span>
             </div>
-          </div>
+            <span class="date-info">{d.info}</span>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
 
   <!-- ============ PRESTATIONS ============ -->
-  <section class="pad prestations">
+  <section class="pad prestations has-decor">
+    <Decor name="accordeon" side="left" top="52%" size={340} rot={-10} out={68} />
     <div class="wrap">
-      <div class="section-head center">
+      <div class="section-head">
         <span class="kicker">Nos prestations</span>
-        <h2 class="h-lg">Ce qu'on fait</h2>
+        <h2 class="h-xl" style="margin-top:14px">Ce qu'on fait</h2>
       </div>
-      <div class="grid grid-3">
+      <ol class="presta-list">
         {prestations.map((p) => (
-          <div class="card presta">
+          <li class="presta-row">
+            <span class="presta-n serif" aria-hidden="true">{p.n}</span>
             <div class="presta-ico"><Icon name={p.ico} /></div>
-            <h3 class="serif" style="font-size:1.35rem;margin-bottom:10px">{p.titre}</h3>
-            <p style="color:var(--encre-soft)">{p.txt}</p>
-          </div>
+            <div class="presta-body">
+              <h3 class="serif">{p.titre}</h3>
+              <p>{p.txt}</p>
+            </div>
+          </li>
         ))}
-      </div>
-      <div class="center" style="margin-top:34px">
+      </ol>
+      <div style="margin-top:38px">
         <a class="btn btn-marine" href="/prestations">Voir toutes les prestations →</a>
       </div>
     </div>
   </section>
+
+  <div class="rule-wave" aria-hidden="true"></div>
 
   <!-- ============ CTA FINAL ============ -->
   <section class="cta-final">
@@ -219,6 +267,35 @@ const galerie = (await getCollection('galerie'))
     window.addEventListener('click', onInteract);
   });
 
+  // Vidéo de présentation : se lance sans le son quand elle arrive à l'écran, s'arrête quand on la quitte.
+  // Le bouton remet la vidéo au début avec le son.
+  const pres = document.querySelector('video.pres-player');
+  const presBtn = document.querySelector('.pres-sound');
+  if (pres && presBtn) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      pres.controls = true;
+      presBtn.hidden = true;
+    } else {
+      new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) { const p = pres.play(); if (p) p.catch(() => {}); }
+          else pres.pause();
+        });
+      }, { threshold: 0.4 }).observe(pres);
+      const toggle = () => {
+        const on = pres.muted;
+        if (on) pres.currentTime = 0;
+        pres.muted = !on;
+        const p = pres.play(); if (p) p.catch(() => {});
+        presBtn.textContent = on ? 'Couper le son' : 'Activer le son';
+        presBtn.setAttribute('aria-pressed', String(on));
+      };
+      presBtn.addEventListener('click', toggle);
+      pres.addEventListener('click', toggle);
+    }
+  }
+
   // Galerie : lightbox au clic (navigation clavier + boutons).
   const lb = document.getElementById('lightbox');
   if (lb) {
@@ -248,20 +325,42 @@ const galerie = (await getCollection('galerie'))
   /* HERO + VIDÉO */
   .hero{position:relative;overflow:hidden;background:var(--marine-d);min-height:min(90vh,760px);display:flex;align-items:center}
   .hero-scene{position:absolute;inset:0;z-index:0}
-  .hero-video{width:100%;height:100%;object-fit:cover;display:block}
+  .hero-video{width:100%;height:100%;object-fit:cover;object-position:75% 50%;display:block}
+  /* La vidéo est déjà sur fond papier à gauche : le voile ne sert qu'à garantir la lecture du texte */
   .hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(100deg,rgba(251,246,236,.98) 0%,rgba(251,246,236,.92) 34%,rgba(251,246,236,.55) 52%,rgba(251,246,236,0) 74%)}
+    background:linear-gradient(100deg,rgba(251,246,236,.96) 0%,rgba(251,246,236,.88) 30%,rgba(251,246,236,.45) 45%,rgba(251,246,236,0) 56%)}
   .hero-in{position:relative;z-index:2;width:100%;padding-top:40px;padding-bottom:84px}
-  .hero-copy{max-width:600px}
-  .hero-copy h1{margin:16px 0 20px}
+  .hero-copy{max-width:660px}
+  .hero-copy h1{margin:14px 0 20px}
   .amp{color:var(--terracotta);font-style:italic}
-  .instr{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:22px 0 28px}
-  .instr-label{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--encre-soft)}
-  .chip{background:rgba(255,255,255,.9);border:1px solid rgba(42,32,24,.12);border-radius:999px;padding:6px 14px;font-size:.85rem;font-weight:600;box-shadow:0 2px 8px -6px rgba(42,32,24,.3)}
+  .instr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 28px}
+  .instr-label{font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;color:var(--encre-soft)}
+  .chip{background:var(--creme);border:1.5px solid var(--encre);border-radius:var(--r-xs);padding:6px 13px;font-size:.83rem;font-weight:700}
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
-  .hero-badge{position:absolute;z-index:2;bottom:24px;right:26px;background:var(--marine);color:#fff;border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
-  .hero-badge strong{font-family:var(--serif);font-size:2rem;line-height:1;color:var(--orange)}
+  .hero-badge{position:absolute;z-index:2;bottom:26px;right:26px;background:var(--marine);color:#fff;border:2px solid var(--encre);border-radius:var(--r);padding:13px 20px;display:flex;align-items:center;gap:12px;box-shadow:var(--hard-sm)}
+  .hero-badge strong{font-family:var(--serif);font-weight:900;font-size:2rem;line-height:1;color:var(--orange)}
   .hero-badge span{font-size:.8rem;max-width:12ch;line-height:1.3;color:#dbe8ee}
+
+  /* VIDÉO DE PRÉSENTATION */
+  .presentation{background:var(--creme)}
+  .pres-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:center}
+  .pres-copy h2{margin:14px 0 14px}
+  .pres-list{list-style:none;margin:22px 0 28px;display:grid;gap:12px}
+  .pres-list li{display:flex;align-items:center;gap:14px;font-weight:700;font-size:1.08rem}
+  .pres-list span{width:34px;height:34px;flex:0 0 auto;border-radius:50%;background:var(--terracotta);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:900}
+  /* vidéo à gauche, texte à droite (vidéo au-dessus du texte sur téléphone) */
+  .pres-video{order:-1;position:relative;justify-self:center;width:min(100%,330px);aspect-ratio:9/16;margin:0;
+    border:2px solid var(--encre);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--hard);background:var(--creme-2)}
+  .pres-player{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+  .pres-sound{position:absolute;left:12px;bottom:12px;font:inherit;font-weight:800;font-size:.85rem;cursor:pointer;
+    background:var(--encre);color:var(--creme);border:0;border-radius:var(--r);padding:9px 14px}
+  .pres-sound:hover{background:var(--terracotta)}
+  .pres-sound:focus-visible{outline:3px solid var(--terracotta);outline-offset:2px}
+  @media(max-width:840px){
+    .pres-grid{grid-template-columns:1fr;gap:28px}
+    .pres-video{width:min(78vw,330px)}
+  }
 
   /* GALERIE — carrousel horizontal */
   .gallery{background:var(--creme-2);overflow:hidden}
@@ -270,11 +369,11 @@ const galerie = (await getCollection('galerie'))
     scrollbar-width:thin;scrollbar-color:var(--terracotta) transparent;-webkit-overflow-scrolling:touch}
   .gal-carousel::-webkit-scrollbar{height:8px}
   .gal-carousel::-webkit-scrollbar-thumb{background:var(--terracotta);border-radius:999px}
-  .gal-thumb{flex:0 0 auto;width:280px;height:280px;padding:0;border:0;border-radius:16px;overflow:hidden;
-    cursor:pointer;scroll-snap-align:center;background:var(--placeholder);box-shadow:var(--shadow-sm);
-    transition:transform .2s ease}
+  .gal-thumb{flex:0 0 auto;width:280px;height:280px;padding:0;border:2px solid var(--encre);border-radius:var(--r);overflow:hidden;
+    cursor:pointer;scroll-snap-align:center;background:var(--placeholder);
+    transition:transform .18s ease, box-shadow .18s ease}
   .gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .gal-thumb:hover{transform:translateY(-3px)}
+  .gal-thumb:hover{transform:translate(-3px,-3px);box-shadow:var(--hard-sm)}
   .gal-thumb:focus-visible{outline:3px solid var(--terracotta);outline-offset:3px}
   @media(max-width:640px){
     .gal-carousel{padding-left:16px;padding-right:16px;gap:12px}
@@ -297,49 +396,91 @@ const galerie = (await getCollection('galerie'))
 
   @media(max-width:860px){
     .hero{min-height:auto}
+    .hero-video{object-position:85% 50%}
     .hero::after{background:linear-gradient(180deg,rgba(251,246,236,.92) 0%,rgba(251,246,236,.6) 42%,rgba(251,246,236,.25) 100%)}
     .hero-in{padding-top:28px;padding-bottom:190px}
     .hero-badge{bottom:16px;right:50%;transform:translateX(50%)}
   }
 
   /* TRACKS */
-  .track{background:#fff;border:1px solid rgba(42,32,24,.07);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow-sm)}
-  .track-t{font-size:1.2rem;font-weight:600;margin-bottom:14px}
+  .track{background:var(--creme);border:2px solid var(--encre);border-radius:var(--r);padding:20px 22px}
+  .track-t{font-size:1.25rem;font-weight:600;margin-bottom:14px}
   .track audio{width:100%;height:44px}
-  .note{text-align:center;margin-top:26px;color:var(--encre-soft);font-size:.92rem;background:var(--sable);display:inline-block;padding:10px 20px;border-radius:999px;position:relative;left:50%;transform:translateX(-50%)}
+  .note{text-align:center;margin-top:26px;color:var(--encre-soft);font-size:.92rem;
+    display:block;font-style:italic}
 
   /* CONCEPT */
   .concept{background:var(--marine);color:#eaf1f4}
   .concept .kicker{color:var(--orange)}
+  .concept .kicker::before{background:var(--orange)}
   .concept h2{color:#fff}
   .concept-in{align-items:center}
-  .concept-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#eaf1f4}
+  .concept-card{background:transparent;border:2px solid rgba(255,255,255,.35);border-radius:var(--r);color:#eaf1f4;padding:28px}
   .concept-card h3{color:#fff}
   .flame{color:var(--orange);margin-bottom:10px}
 
-  /* AGENDA */
-  .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:34px;flex-wrap:wrap}
-  .date{display:flex;gap:18px;align-items:center}
-  .date-badge{flex:0 0 auto;width:64px;height:64px;border-radius:14px;background:var(--terracotta);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-  .date-badge strong{font-family:var(--serif);font-size:1.5rem}
-  .date-badge span{font-size:.7rem;letter-spacing:.08em;margin-top:2px}
-  .date-when{font-size:.82rem;color:var(--encre-soft);font-weight:600}
-  .date-lieu{font-size:1.15rem;margin:2px 0}
-  .date-ville{font-size:.9rem;color:var(--encre-soft)}
-  .date-info{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--iode);background:rgba(28,110,126,.1);padding:3px 10px;border-radius:999px}
+  /* AGENDA — lignes éditoriales à filets */
+  .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:30px;flex-wrap:wrap}
+  .date-list{list-style:none;border-top:2px solid var(--encre)}
+  .date-row{display:flex;gap:22px;align-items:center;padding:20px 4px;border-bottom:1px solid var(--line-soft)}
+  .date-badge{flex:0 0 auto;width:66px;height:66px;border-radius:var(--r);background:var(--terracotta);color:#fff;
+    border:2px solid var(--encre);box-shadow:var(--hard-sm);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .date-badge strong{font-family:var(--serif);font-weight:900;font-size:1.5rem}
+  .date-badge span{font-size:.68rem;letter-spacing:.1em;margin-top:3px;font-weight:700}
+  .date-main{flex:1 1 auto}
+  .date-when{font-size:.78rem;color:var(--encre-soft);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .date-lieu{font-size:1.3rem;margin:2px 0;font-weight:600}
+  .date-ville{font-size:.92rem;color:var(--encre-soft)}
+  .date-info{flex:0 0 auto;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--iode);border:1.5px solid var(--iode);padding:5px 11px;border-radius:var(--r-xs)}
+  @media(max-width:640px){
+    .date-row{flex-wrap:wrap;gap:14px}
+    .date-info{order:3;width:100%}
+  }
 
-  /* PRESTATIONS */
+  /* PRESTATIONS — sommaire éditorial numéroté */
   .prestations{background:var(--creme-2)}
-  .presta-ico{width:58px;height:58px;border-radius:14px;background:var(--sable);color:var(--terracotta);
-    display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-  .presta{transition:transform .18s,box-shadow .2s}
-  .presta:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .presta-list{list-style:none}
+  .presta-row{display:grid;grid-template-columns:auto 58px 1fr;gap:22px;align-items:start;
+    padding:26px 0;border-top:2px solid var(--encre)}
+  .presta-row:last-child{border-bottom:2px solid var(--encre)}
+  .presta-n{font-weight:900;font-size:1.5rem;color:var(--terracotta);line-height:1;padding-top:6px}
+  .presta-ico{width:58px;height:58px;border-radius:var(--r);background:var(--sable);color:var(--terracotta);
+    border:1.5px solid var(--encre);display:flex;align-items:center;justify-content:center}
+  .presta-body h3{font-size:1.5rem;margin-bottom:8px}
+  .presta-body p{color:var(--encre-soft);max-width:60ch}
+  @media(max-width:640px){
+    .presta-row{grid-template-columns:auto 1fr;gap:14px 16px}
+    .presta-ico{display:none}
+  }
 
   /* CTA FINAL */
-  .cta-final{background:linear-gradient(135deg,var(--terracotta),var(--terracotta-d));padding:clamp(56px,8vw,96px) 0}
+  .cta-final{background:var(--terracotta);border-top:3px solid var(--encre);padding:clamp(56px,8vw,96px) 0}
   .cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .cta-btn{background:#fff;color:var(--terracotta);font-size:1.05rem;padding:16px 32px}
-  .cta-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-  .cta-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.55);font-size:1.05rem;padding:16px 32px}
-  .cta-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+  .cta-btn{background:var(--creme);color:var(--terracotta);border-color:var(--encre);font-size:1.05rem;padding:16px 32px}
+  .cta-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--encre)}
+  .cta-ghost{background:transparent;color:#fff;border-color:#fff;font-size:1.05rem;padding:16px 32px}
+  .cta-ghost:hover{background:#fff;color:var(--terracotta)}
+
+/* ===== Casser les blocs de couleur ===== */
+/* Section « D'où vient » : vraie photo de concert en bichromie au lieu d'un aplat bleu, bords en vague */
+.concept{
+  background:linear-gradient(100deg,rgba(12,42,62,.9) 0%,rgba(12,42,62,.72) 45%,rgba(12,42,62,.3) 100%),
+    url(/img/fond-scene.jpg) 70% 40%/cover no-repeat;
+  --vague:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14 Q40 0 80 14 T160 14 V28 H0Z'/%3E%3C/svg%3E");
+  --vague-b:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 14 Q40 28 80 14 T160 14 V0 H0Z'/%3E%3C/svg%3E");
+  -webkit-mask:var(--vague) top left/160px 28px repeat-x, linear-gradient(#000 0 0) center/100% calc(100% - 54px) no-repeat, var(--vague-b) bottom left/160px 28px repeat-x;
+          mask:var(--vague) top left/160px 28px repeat-x, linear-gradient(#000 0 0) center/100% calc(100% - 54px) no-repeat, var(--vague-b) bottom left/160px 28px repeat-x;
+  margin:-14px 0}
+/* Bandeau final : une affiche posée sur une carte marine, qui tangue très doucement comme un bateau */
+.cta-final{background:var(--creme) url(/img/carte-marine.svg) center/1400px auto no-repeat;border-top:0}
+.cta-final > .wrap{max-width:860px;background:var(--terracotta);border:2px solid var(--encre);
+  border-radius:var(--r);box-shadow:8px 8px 0 var(--encre);padding:clamp(36px,5vw,58px) clamp(22px,4vw,48px);
+  transform:rotate(-1.2deg);animation:affiche-tangue 7s ease-in-out infinite}
+/* au survol ou au clavier, l'affiche se pose : boutons parfaitement immobiles pour cliquer */
+.cta-final > .wrap:hover,.cta-final > .wrap:focus-within{animation-play-state:paused}
+@keyframes affiche-tangue{
+  0%,100%{transform:translateY(0) rotate(-1.2deg)}
+  50%{transform:translateY(-5px) rotate(-.4deg)}}
 </style>

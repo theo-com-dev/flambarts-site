@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Decor from '../components/Decor.astro';
 import Icon from '../components/Icon.astro';
 
 const prestations = [
@@ -19,7 +20,8 @@ const inclus = [
 ---
 <Base active="prestations" title="Prestations" description="Restaurants, événements d'entreprise, fêtes locales, caritatif : Les Flambarts s'adaptent à toutes vos occasions, en toute autonomie.">
 
-  <section class="page-hero">
+  <section class="page-hero has-decor">
+    <Decor name="basse" side="right" top="-12%" size={230} rot={-16} out={14} />
     <div class="wrap">
       <h1 class="h-xl">Prestations</h1>
       <p class="lead">
@@ -98,23 +100,27 @@ const inclus = [
 </Base>
 
 <style>
-  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero{background:var(--creme);border-bottom:2px solid var(--encre);padding:clamp(48px,7vw,88px) 0}
   .page-hero .kicker{margin-bottom:16px}
   .page-hero h1{margin-bottom:18px}
-  .presta-ico{width:58px;height:58px;border-radius:14px;background:var(--sable);color:var(--terracotta);
-    display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-  .presta{transition:transform .18s,box-shadow .2s}
-  .presta:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .presta{transition:transform .16s ease,box-shadow .16s ease}
+  .presta:hover{transform:translate(-3px,-3px);box-shadow:var(--hard)}
+  .presta-ico{width:58px;height:58px;border-radius:var(--r);background:var(--sable);color:var(--terracotta);
+    border:1.5px solid var(--encre);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
   .practique{background:var(--creme-2)}
-  .prat{display:flex;gap:16px;background:#fff;border:1px solid rgba(42,32,24,.07);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)}
+  .prat{display:flex;gap:16px;background:var(--creme);border:2px solid var(--encre);border-radius:var(--r);padding:24px}
   .prat-ico{flex:0 0 auto;color:var(--terracotta)}
-  .prat-t{font-size:1.15rem}
-  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;max-width:70ch;margin-left:auto;margin-right:auto}
+  .prat-t{font-size:1.18rem}
+  .note-band{text-align:center;margin-top:30px;color:var(--encre-soft);font-size:.92rem;font-style:italic;max-width:70ch;margin-left:auto;margin-right:auto}
   .fiche-band{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
-    background:#fff;border:1px solid rgba(42,32,24,.08);border-radius:var(--radius);padding:30px 34px;box-shadow:var(--shadow-sm)}
+    background:var(--marine);color:#eaf1f4;border:2px solid var(--encre);border-radius:var(--r);padding:30px 34px;box-shadow:var(--hard-sm)}
+  .fiche-band .kicker{color:var(--orange)}
+  .fiche-band .kicker::before{background:var(--orange)}
+  .fiche-band h2{color:#fff}
+  .fiche-band p{color:#cfe0e8 !important}
   .fiche-btn{display:inline-flex;align-items:center;gap:10px;font-size:1rem;white-space:nowrap}
   @media(max-width:640px){.fiche-band{flex-direction:column;align-items:flex-start}}
-  .cta-final{background:linear-gradient(135deg,var(--terracotta),var(--terracotta-d));padding:clamp(56px,8vw,96px) 0}
-  .cta-btn{background:#fff;color:var(--terracotta);font-size:1.05rem;padding:16px 32px}
-  .cta-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .cta-final{background:var(--terracotta);border-top:3px solid var(--encre);padding:clamp(56px,8vw,96px) 0}
+  .cta-btn{background:var(--creme);color:var(--terracotta);border-color:var(--encre);font-size:1.05rem;padding:16px 32px}
+  .cta-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--encre)}
 </style>

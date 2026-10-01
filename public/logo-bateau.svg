@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 190 940 680">
+  <!-- Logo Les Flambarts : la chaloupe seule, redessinée en vectoriel d'après le logo d'origine -->
+  <title>Les Flambarts</title>
+  <g stroke-linecap="round">
+    <line x1="608" y1="250" x2="962" y2="782" stroke="#9AA0A6" stroke-width="5"/>
+    <line x1="742" y1="828" x2="964" y2="784" stroke="#9AA0A6" stroke-width="5"/>
+  </g>
+  <path d="M196 204 L462 428 L456 774 L54 732 Z" fill="#C9481D"/>
+  <path d="M488 244 L690 414 L698 766 L462 742 Z" fill="#C9481D"/>
+  <path d="M726 420 L966 782 L722 762 Z" fill="#E06A42"/>
+  <g stroke="#7A2A10" stroke-width="3" opacity=".55">
+    <line x1="196" y1="204" x2="462" y2="428"/>
+    <line x1="488" y1="244" x2="690" y2="414"/>
+  </g>
+  <g stroke="#5A3A28" stroke-width="7" stroke-linecap="round">
+    <line x1="372" y1="270" x2="378" y2="796"/>
+    <line x1="606" y1="256" x2="610" y2="786"/>
+  </g>
+  <path d="M206 796 Q470 806 742 770 L736 846 Q480 860 222 852 Z" fill="#3D3F45"/>
+  <path d="M214 818 Q475 826 738 794" fill="none" stroke="#F4F1EA" stroke-width="7"/>
+</svg>

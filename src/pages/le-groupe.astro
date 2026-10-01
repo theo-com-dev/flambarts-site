@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Decor from '../components/Decor.astro';
 import Icon from '../components/Icon.astro';
 
 const musiciens = [
@@ -14,7 +15,8 @@ const musiciens = [
 ---
 <Base active="groupe" title="Le groupe" description="Les Flambarts : sept musiciens d'Herbignac et de sa région, réunis autour des chants marins traditionnels.">
 
-  <section class="page-hero">
+  <section class="page-hero has-decor">
+    <Decor name="accordeon" side="right" top="55%" size={440} rot={12} />
     <div class="wrap">
       <h1 class="h-xl">Le groupe</h1>
       <p class="lead">
@@ -70,18 +72,20 @@ const musiciens = [
 </Base>
 
 <style>
-  .page-hero{background:linear-gradient(180deg,var(--creme),var(--creme-2));padding:clamp(48px,7vw,88px) 0}
+  .page-hero{background:var(--creme);border-bottom:2px solid var(--encre);padding:clamp(48px,7vw,88px) 0}
   .page-hero .kicker{margin-bottom:16px}
   .page-hero h1{margin-bottom:18px}
-  .musicien{text-align:center}
-  .musicien-ph{width:150px;height:150px;border-radius:50%;object-fit:cover;margin:0 auto;background:var(--placeholder);display:block}
-  .musicien-role{color:var(--terracotta);font-weight:600;font-size:.92rem;margin-top:4px}
+  .musicien{text-align:center;transition:transform .16s ease,box-shadow .16s ease}
+  .musicien:hover{transform:translate(-3px,-3px);box-shadow:var(--hard)}
+  .musicien-ph{width:150px;height:150px;border-radius:50%;object-fit:cover;margin:0 auto;background:var(--placeholder);border:2px solid var(--encre);display:block}
+  .musicien-role{color:var(--terracotta);font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
   .join{display:flex;flex-direction:column;justify-content:center;text-align:center;background:var(--marine);color:#fff}
+  .join:hover{transform:none;box-shadow:none}
   .join h3{color:#fff}
   .join-flame{color:var(--orange);margin-bottom:8px}
   .concept-band{background:var(--creme-2)}
   .groupe-intro{max-width:660px}
   .groupe-duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
-  .groupe-duo img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius);box-shadow:var(--shadow);display:block}
+  .groupe-duo img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r);border:2px solid var(--encre);box-shadow:var(--hard-sm);display:block}
   @media(max-width:700px){.groupe-duo{grid-template-columns:1fr}}
 </style>
