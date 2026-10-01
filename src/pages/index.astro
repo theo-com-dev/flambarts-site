@@ -4,7 +4,6 @@ import Decor from '../components/Decor.astro';
 import Icon from '../components/Icon.astro';
 import { getCollection } from 'astro:content';
 
-const instruments = ['Accordéon diatonique', 'Accordéon chromatique', 'Guitare', 'Basse', 'Cajon', '2 voix'];
 
 // Version de la vidéo du hero : à augmenter à chaque nouvelle vidéo pour que les navigateurs
 // ne gardent pas l'ancienne en mémoire.
@@ -14,11 +13,21 @@ const heroV = '6';
 const extraits = (await getCollection('musique'))
   .map((e) => ({ titre: e.data.titre, src: e.data.fichier }))
   .sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
-const agenda = [
-  { j: '15', m: 'AOÛT', quand: 'Samedi · 18h00', lieu: 'Fête du Port', ville: 'Le Croisic (44)', info: 'Entrée libre' },
-  { j: '21', m: 'AOÛT', quand: 'Vendredi · 20h30', lieu: 'Festival Chants de Marins', ville: 'Paimpol (22)', info: 'Billetterie' },
-  { j: '05', m: 'SEPT', quand: 'Samedi · 17h00', lieu: 'Fête de la Mer', ville: 'La Turballe (44)', info: 'Entrée libre' },
-];
+// Agenda : depuis /admin. (Pour l'instant toutes les dates sont affichées, même passées.)
+const MOIS = ['JANV', 'FÉVR', 'MARS', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
+const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const agenda = (await getCollection('agenda'))
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
+  .slice(0, 4)
+  .map((e) => {
+    const d = e.data.date;
+    return {
+      iso: d.toISOString().slice(0, 10),
+      j: String(d.getUTCDate()).padStart(2, '0'), m: MOIS[d.getUTCMonth()],
+      quand: e.data.heure ? `${JOURS[d.getUTCDay()]} · ${e.data.heure}` : JOURS[d.getUTCDay()],
+      lieu: e.data.lieu, ville: e.data.ville, info: e.data.info,
+    };
+  });
 const prestations = [
   { n: '01', ico: 'glass', titre: 'Restaurants & bars', txt: "On passe entre les tables et on chante, sans couvrir les conversations. Vos clients restent, et ils reviennent." },
   { n: '02', ico: 'building', titre: "Événements d'entreprise", txt: "Séminaires, inaugurations, soirées clients. Un moment qui change des discours et fait chanter les équipes." },
@@ -46,24 +55,21 @@ const galerie = (await getCollection('galerie'))
 
     <div class="wrap hero-in">
       <div class="hero-copy">
-        <span class="kicker">Groupe de chants marins · Bretagne</span>
-        <h1 class="h-display">Chants marins <span class="amp">&amp;</span> ambiance bord de mer</h1>
+        <span class="kicker">7 musiciens · Herbignac, presqu'île guérandaise (44)</span>
+        <h1 class="h-display">Chants marins pour vos fêtes <span class="amp">&amp;</span> événements</h1>
         <p class="lead">
-          Sept musiciens d'Herbignac qui reprennent les grands chants de marins, de « Santiano »
-          à « Nous irons à Valparaiso ». Des refrains que toute la salle finit par chanter avec nous.
+          Mariages, fêtes de village, restaurants, soirées d'entreprise : on reprend les grands chants
+          de marins, de « Santiano » à « Nous irons à Valparaiso », et toute la salle finit par chanter avec nous.
         </p>
-        <div class="instr">
-          <span class="instr-label">À l'oreille :</span>
-          {instruments.map((i) => <span class="chip">{i}</span>)}
-        </div>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="#extraits">▶ Nous écouter</a>
-          <a class="btn btn-ghost" href="#agenda">Nos prochaines dates</a>
+          <a class="btn btn-primary" href="/contact">Faire jouer les Flambarts</a>
+          <a class="btn btn-ghost" href="#extraits">▶ Nous écouter</a>
         </div>
+        <p class="hero-proof">Déjà sur scène au <strong>Festival Voix Marines</strong></p>
       </div>
     </div>
 
-    <div class="hero-badge"><strong>7</strong><span>musiciens · 100 % bonne humeur</span></div>
+    <div class="hero-badge"><strong>7</strong><span>musiciens · Herbignac (44)</span></div>
   </section>
 
   <div class="rule-wave" aria-hidden="true"></div>
@@ -116,7 +122,7 @@ const galerie = (await getCollection('galerie'))
     </div>
     <!-- Barre à roue : la tourner fait défiler les photos (30 % sur les photos, 70 % dessous) -->
     <div class="helm-wrap">
-      <div class="rope" aria-hidden="true"></div>
+      <svg class="rope" aria-hidden="true"></svg>
       <div class="helm" role="slider" tabindex="0" aria-label="Barre à roue : tournez-la pour faire défiler les photos"
         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Début de la galerie">
         <svg class="helm-svg" viewBox="-110 -110 220 220" aria-hidden="true">
@@ -221,19 +227,24 @@ const galerie = (await getCollection('galerie'))
         <div><span class="kicker">Agenda</span><h2 class="h-xl" style="margin-top:12px">Où nous voir bientôt</h2></div>
         <a class="btn btn-ghost" href="/actualites">Toutes les dates →</a>
       </div>
-      <ul class="date-list">
+      <ul class="date-list" data-agenda>
         {agenda.map((d) => (
-          <li class="date-row">
+          <li class="date-row" data-date={d.iso}>
             <div class="date-badge"><strong>{d.j}</strong><span>{d.m}</span></div>
             <div class="date-main">
               <div class="date-when">{d.quand}</div>
               <div class="date-lieu serif">{d.lieu}</div>
               <div class="date-ville">{d.ville}</div>
             </div>
-            <span class="date-info">{d.info}</span>
+            {d.info && <span class="date-info">{d.info}</span>}
           </li>
         ))}
       </ul>
+      <p class="agenda-vide" hidden={agenda.length > 0}>
+        Prochaines dates bientôt annoncées. En attendant, suivez-nous sur
+        <a href="https://www.facebook.com/p/Les-Flambarts-61557394624239/" target="_blank" rel="noopener">Facebook</a>,
+        ou <a href="/contact">faites-nous jouer chez vous</a>.
+      </p>
     </div>
   </section>
 
@@ -347,10 +358,83 @@ const galerie = (await getCollection('galerie'))
     const rope = document.querySelector('.rope');
     let turning = false, lastA = 0;
     const max = () => car.scrollWidth - car.clientWidth;
+
+    // Corde détendue de chaque côté de la barre : elle pend un peu, défile avec les photos,
+    // et des nœuds se font quand on avance dans la galerie, se défont quand on revient.
+    const NS = 'http://www.w3.org/2000/svg';
+    const KNOTS = 3; // par côté
+    const WAVE = 26, WAVELEN = 230; // ondulation de la corde (vers le haut et le bas)
+    const ropeParts = [];
+    const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+    if (rope) {
+      for (const side of [-1, 1]) {
+        const g = mk('g', {}, rope);
+        const outline = mk('path', { fill: 'none', stroke: '#241A12', 'stroke-width': 15, 'stroke-linecap': 'round' }, g);
+        const body = mk('path', { fill: 'none', stroke: '#D6A15E', 'stroke-width': 10, 'stroke-linecap': 'round' }, g);
+        const twist = mk('path', { fill: 'none', stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' }, g);
+        const knots = [];
+        for (let k = 0; k < KNOTS; k++) {
+          const kg = mk('g', {}, g);
+          // nœud bien serré : une boucle fermée au-dessus, la corde qui ressort croisée dessous
+          const strand = (d, w) => {
+            mk('path', { d, fill: 'none', stroke: '#241A12', 'stroke-width': w + 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, kg);
+            mk('path', { d, fill: 'none', stroke: '#D6A15E', 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, kg);
+            mk('path', { d, fill: 'none', stroke: '#8A5A2B', 'stroke-width': w, 'stroke-dasharray': '2.5 6' }, kg);
+          };
+          strand('M-26 4 C-10 4 -6 -2 -2 -10 C4 -26 -22 -40 -26 -22 C-30 -6 -4 2 12 -2 L30 -4', 10);
+          strand('M-30 -6 C-16 -2 -10 8 4 12 C14 15 22 8 30 6', 10);
+          mk('ellipse', { cx: -8, cy: 0, rx: 15, ry: 12, fill: '#C9934F', stroke: '#241A12', 'stroke-width': 4 }, kg);
+          strand('M-17 -7 L1 7', 6);
+          strand('M-17 7 L1 -7', 6);
+          knots.push(kg);
+        }
+        ropeParts.push({ side, outline, body, twist, knots });
+      }
+    }
+    function drawRope() {
+      if (!rope || !helm) return;
+      const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2;
+      rope.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const hub = helm.clientWidth * 0.16;
+      const p = max() > 0 ? car.scrollLeft / max() : 0;
+      const sag = 30 - 12 * p; // la corde se raccourcit un peu quand les nœuds se font
+      const phase = car.scrollLeft / 90; // les vagues de la corde avancent avec les photos
+      for (const part of ropeParts) {
+        const x0 = part.side < 0 ? -10 : W + 10;
+        const x1 = W / 2 + part.side * hub;
+        const n = Math.max(12, Math.round(Math.abs(x1 - x0) / 8));
+        let d = '';
+        for (let i = 0; i <= n; i++) {
+          const u = i / n;
+          const x = x0 + (x1 - x0) * u;
+          const base = (cy - 16) + (16 + sag * 1.6) * 4 * u * (1 - u) + 16 * u * u;
+          const env = Math.sin(Math.PI * Math.min(1, u * 1.15)); // calme aux extrémités
+          const y = base + WAVE * env * Math.sin((Math.abs(x - x1) / WAVELEN) * Math.PI * 2 - part.side * phase);
+          d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        }
+        part.outline.setAttribute('d', d); part.body.setAttribute('d', d); part.twist.setAttribute('d', d);
+        part.twist.setAttribute('stroke-dashoffset', String(part.side * car.scrollLeft * 0.6));
+        const len = part.body.getTotalLength();
+        part.knots.forEach((kg, k) => {
+          const t = (k + 1) / (KNOTS + 1);
+          const at = part.body.getPointAtLength(len * t);
+          const nx = part.body.getPointAtLength(Math.min(len, len * t + 2));
+          const ang = Math.atan2(nx.y - at.y, nx.x - at.x) * 180 / Math.PI;
+          // ordre : les nœuds se font des bords vers la barre, en alternant les côtés
+          const order = k * 2 + (part.side < 0 ? 0 : 1);
+          let sc = Math.min(1, Math.max(0, p * KNOTS * 2 - order));
+          sc = sc * sc * (3 - 2 * sc);
+          kg.setAttribute('transform', `translate(${at.x} ${at.y}) rotate(${ang + (1 - sc) * 220}) scale(${sc * 1.25})`);
+          kg.style.opacity = sc < 0.02 ? '0' : '1';
+        });
+      }
+    }
+    addEventListener('resize', drawRope);
+    requestAnimationFrame(drawRope);
     const sync = () => {
       if (!rot) return;
       rot.style.transform = `rotate(${car.scrollLeft / PX_PER_DEG}deg)`;
-      if (rope) rope.style.backgroundPositionX = `${-car.scrollLeft * 0.6}px`;
+      drawRope();
       const pct = max() > 0 ? Math.round((car.scrollLeft / max()) * 100) : 0;
       helm.setAttribute('aria-valuenow', String(pct));
       helm.setAttribute('aria-valuetext', pct <= 0 ? 'Début de la galerie' : pct >= 100 ? 'Fin de la galerie' : `Photos à ${pct} %`);
@@ -437,8 +521,9 @@ const galerie = (await getCollection('galerie'))
   .hero-copy{max-width:660px}
   .hero-copy h1{margin:14px 0 20px}
   .amp{color:var(--terracotta);font-style:italic}
-  .instr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 28px}
-  .instr-label{font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;color:var(--encre-soft)}
+  .hero-copy .lead{margin-bottom:28px}
+  .hero-proof{margin-top:18px;font-size:.92rem;color:var(--encre-soft)}
+  .hero-proof strong{color:var(--encre)}
   .chip{background:var(--creme);border:1.5px solid var(--encre);border-radius:var(--r-xs);padding:6px 13px;font-size:.83rem;font-weight:700}
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
   .hero-badge{position:absolute;z-index:2;bottom:26px;right:26px;background:var(--marine);color:#fff;border:2px solid var(--encre);border-radius:var(--r);padding:13px 20px;display:flex;align-items:center;gap:12px;box-shadow:var(--hard-sm)}
@@ -480,10 +565,8 @@ const galerie = (await getCollection('galerie'))
   .helm-wrap{--helm:190px;display:flex;justify-content:center;position:relative;z-index:3;isolation:isolate;
     margin-top:calc(var(--helm) * -.3 - 20px);pointer-events:none}
   /* corde tressée qui traverse l'écran derrière la barre et défile avec les photos */
-  .rope{position:absolute;top:50%;left:50%;width:100vw;height:16px;transform:translate(-50%,-50%);z-index:-1;
-    border-top:2px solid var(--encre);border-bottom:2px solid var(--encre);
-    background:repeating-linear-gradient(-55deg,#D6A15E 0 6px,#B97A3D 6px 9px,#8A5A2B 9px 11px);
-    box-shadow:0 4px 0 rgba(36,26,18,.18);pointer-events:none}
+  .rope{position:absolute;top:50%;left:50%;width:100vw;height:220px;transform:translate(-50%,-50%);z-index:-1;
+    overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(36,26,18,.18))}
   .helm{width:var(--helm);height:var(--helm);border-radius:50%;cursor:grab;touch-action:none;pointer-events:auto;
     filter:drop-shadow(6px 6px 0 var(--encre))}
   .helm.turning{cursor:grabbing}
@@ -546,6 +629,8 @@ const galerie = (await getCollection('galerie'))
   .flame{color:var(--orange);margin-bottom:10px}
 
   /* AGENDA — lignes éditoriales à filets */
+  .agenda-vide{border-top:2px solid var(--encre);padding:26px 0 6px;font-size:1.08rem;color:var(--encre-soft)}
+  .agenda-vide a{color:var(--terracotta);font-weight:700;text-decoration:underline}
   .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:30px;flex-wrap:wrap}
   .date-list{list-style:none;border-top:2px solid var(--encre)}
   .date-row{display:flex;gap:22px;align-items:center;padding:20px 4px;border-bottom:1px solid var(--line-soft)}
