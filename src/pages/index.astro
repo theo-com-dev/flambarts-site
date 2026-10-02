@@ -359,54 +359,101 @@ const galerie = (await getCollection('galerie'))
     let turning = false, lastA = 0;
     const max = () => car.scrollWidth - car.clientWidth;
 
-    // Une seule corde : elle part du bord gauche, passe derrière la barre, et avance vers la droite
-    // à mesure qu'on avance dans les photos. Arrivée au bout, elle s'enroule sur elle-même en UN nœud.
-    // On revient en arrière : elle se déroule et recule.
+    // Une seule corde, modélisée point par point (aucune image, aucun masque) :
+    // on calcule tout son tracé (bord gauche -> barre -> nœud -> bout libre), puis on ne dessine
+    // que la longueur déroulée selon l'avancement dans les photos. Le bout avance donc réellement,
+    // fait le tour de la boucle et se noue sous les yeux ; en revenant, il se dénoue et recule.
     const NS = 'http://www.w3.org/2000/svg';
-    const WAVE = 18, WAVELEN = 230;
+    const WAVE = 16, WAVELEN = 230;
     const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
-    let ropeLayers = null;
+    const ROPE = { outline: { stroke: '#241A12', 'stroke-width': 15 }, body: { stroke: '#D6A15E', 'stroke-width': 10 }, twist: { stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' } };
+    const layer = (g, cap) => Object.fromEntries(Object.entries(ROPE).map(([k, at]) =>
+      [k, mk('path', { fill: 'none', 'stroke-linecap': cap, 'stroke-linejoin': 'round', ...at }, g)]));
+    let rp = null;
     if (rope) {
-      const defs = mk('defs', {}, rope);
-      const mask = mk('mask', { id: 'corde-visible', maskUnits: 'userSpaceOnUse' }, defs);
-      const reveal = mk('path', { fill: 'none', stroke: '#fff', 'stroke-width': 30, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, mask);
-      const g = mk('g', { mask: 'url(#corde-visible)' }, rope);
-      const outline = mk('path', { fill: 'none', stroke: '#241A12', 'stroke-width': 15, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
-      const body = mk('path', { fill: 'none', stroke: '#D6A15E', 'stroke-width': 10, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
-      const twist = mk('path', { fill: 'none', stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' }, g);
-      ropeLayers = { reveal, outline, body, twist };
+      const main = mk('g', {}, rope);
+      rp = { main: layer(main, 'round'), overs: [0, 1, 2].map(() => layer(mk('g', {}, rope), 'butt')),
+        whip: mk('rect', { width: 9, height: 17, x: -4.5, y: -8.5, rx: 2, fill: '#C24E2C', stroke: '#241A12', 'stroke-width': 2.5 }, rope) };
     }
+    // points d'une courbe de Bézier cubique
+    const bez = (P0, P1, P2, P3, n, out) => {
+      for (let i = 1; i <= n; i++) {
+        const t = i / n, u = 1 - t;
+        out.push([u*u*u*P0[0] + 3*u*u*t*P1[0] + 3*u*t*t*P2[0] + t*t*t*P3[0], u*u*u*P0[1] + 3*u*u*t*P1[1] + 3*u*t*t*P2[1] + t*t*t*P3[1]]);
+      }
+    };
+    const toD = (pts) => pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
     function drawRope() {
-      if (!ropeLayers || !helm) return;
-      const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2;
+      if (!rp || !helm) return;
+      const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2 + 6;
       rope.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      const p = max() > 0 ? Math.min(1, car.scrollLeft / max()) : 0;
+      const prog = max() > 0 ? Math.min(1, car.scrollLeft / max()) : 0;
       const phase = car.scrollLeft / 90;
       const xHub = W / 2;
-      const xKnot = Math.min(W - 120, W * 0.82);
-      // 1) de la gauche jusqu'au nœud, en ondulant (calme près des extrémités)
-      let d = '';
-      const x0 = -10, n = Math.round((xKnot - x0) / 8);
-      for (let i = 0; i <= n; i++) {
-        const u = i / n, x = x0 + (xKnot - x0) * u;
+      const xKnot = W * 0.66, r = Math.min(42, W * 0.03), xEnd = Math.min(W - 30, xKnot + r * 5.5);
+      // 1) tracé complet
+      const pts = [];
+      const x0 = -10;
+      for (let x = x0; x <= xKnot; x += 6) {
+        const u = (x - x0) / (xKnot - x0);
         const env = Math.sin(Math.PI * u) * Math.min(1, Math.abs(x - xHub) / 60);
-        const y = cy + 6 + WAVE * env * Math.sin(((x - x0) / WAVELEN) * Math.PI * 2 - phase);
-        d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        pts.push([x, cy + WAVE * env * Math.sin(((x - x0) / WAVELEN) * Math.PI * 2 - phase)]);
       }
-      // 2) le nœud : la corde fait une boucle fermée, repasse sur elle-même, puis une courte queue
-      // boucle vers le bas (sous la corde) pour ne pas se mêler à la barre de défilement des photos
-      const k = xKnot, r = 40, ky = cy + 6;
-      d += ` C${k + r * 1.4} ${ky} ${k + r * 1.4} ${ky + r * 1.9} ${k} ${ky + r * 1.9}`;
-      d += ` C${k - r * 1.5} ${ky + r * 1.9} ${k - r * 1.3} ${ky - r * 0.5} ${k + r * 0.4} ${ky - r * 0.45}`;
-      d += ` C${k + r * 1.2} ${ky - r * 0.42} ${k + r * 1.9} ${ky - r * 0.1} ${k + r * 2.8} ${ky + r * 0.7}`;
-      for (const el of [ropeLayers.reveal, ropeLayers.outline, ropeLayers.body, ropeLayers.twist]) el.setAttribute('d', d);
-      ropeLayers.twist.setAttribute('stroke-dashoffset', String(-car.scrollLeft * 0.6));
-      // longueur visible : toujours jusqu'à la barre, puis on avance jusqu'au bout du nœud
-      const total = ropeLayers.body.getTotalLength();
-      let toHub = 0;
-      { const step = 6; while (toHub < total && ropeLayers.body.getPointAtLength(toHub).x < xHub + 10) toHub += step; }
-      const vis = toHub + (total - toHub) * p;
-      ropeLayers.reveal.setAttribute('stroke-dasharray', `${vis} ${total + 100}`);
+      const K = [xKnot, cy];
+      const knotStart = pts.length;
+      // boucle sous la corde, retour qui croise le brin d'arrivée, puis sortie vers le bout libre
+      bez(K, [K[0] + r * 1.5, K[1]], [K[0] + r * 1.5, K[1] + r * 2], [K[0], K[1] + r * 2], 24, pts);
+      bez(pts[pts.length - 1], [K[0] - r * 1.6, K[1] + r * 2], [K[0] - r * 1.4, K[1] - r * 0.6], [K[0] + r * 0.3, K[1] - r * 0.5], 24, pts);
+      bez(pts[pts.length - 1], [K[0] + r * 1.4, K[1] - r * 0.45], [K[0] + r * 1.7, K[1] + r * 0.4], [K[0] + r * 2.6, K[1] + r * 0.5], 16, pts);
+      const last = pts[pts.length - 1];
+      for (let x = last[0] + 6; x <= xEnd; x += 6) {
+        const u = (x - last[0]) / (xEnd - last[0]);
+        pts.push([x, last[1] + 5 * Math.sin(u * Math.PI)]);
+      }
+      // longueurs cumulées
+      const L = [0];
+      for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      const total = L[L.length - 1];
+      let iHub = pts.findIndex((q) => q[0] >= xHub + 12); if (iHub < 0) iHub = 0;
+      // 2) longueur déroulée : jusqu'à la barre au départ, jusqu'au bout libre à la fin
+      const vis = L[iHub] + (total - L[iHub]) * prog;
+      const shown = [];
+      for (let i = 0; i < pts.length; i++) {
+        if (L[i] <= vis) { shown.push(pts[i]); continue; }
+        const f = (vis - L[i - 1]) / (L[i] - L[i - 1]);
+        shown.push([pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f]);
+        break;
+      }
+      const d = toD(shown);
+      const off = String(-car.scrollLeft * 0.6);
+      for (const k of ['outline', 'body', 'twist']) rp.main[k].setAttribute('d', d);
+      rp.main.twist.setAttribute('stroke-dashoffset', off);
+      // 3) croisements : le brin qui repasse est redessiné par-dessus (dessus / dessous du nœud)
+      const crossings = [];
+      if (shown.length > knotStart + 30) {
+        for (let j = knotStart + 30; j < shown.length && crossings.length < 3; j++) {
+          for (let i = Math.max(0, knotStart - 40); i < j - 25; i++) {
+            if (Math.hypot(shown[j][0] - shown[i][0], shown[j][1] - shown[i][1]) < 5) { crossings.push(j); j += 10; break; }
+          }
+        }
+      }
+      rp.overs.forEach((ov, n) => {
+        const j = crossings[n];
+        const on = j !== undefined;
+        if (on) {
+          const st = Math.max(0, j - 4);
+          const dd = toD(shown.slice(st, Math.min(shown.length, j + 5)));
+          for (const k of ['outline', 'body', 'twist']) ov[k].setAttribute('d', dd);
+          // même motif de torsade que la corde à cet endroit : raccord invisible
+          ov.twist.setAttribute('stroke-dashoffset', String(-car.scrollLeft * 0.6 + L[st]));
+        }
+        for (const k of ['outline', 'body', 'twist']) ov[k].style.visibility = on ? 'visible' : 'hidden';
+      });
+      // 4) le bout de la corde : une ligature terracotta qui suit sa direction
+      const tip = shown[shown.length - 1], prev = shown[Math.max(0, shown.length - 3)];
+      const ang = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]) * 180 / Math.PI;
+      rp.whip.setAttribute('transform', `translate(${tip[0]} ${tip[1]}) rotate(${ang}) translate(-6 0)`);
+      rp.whip.style.visibility = shown.length > iHub ? 'visible' : 'hidden';
     }
     addEventListener('resize', drawRope);
     requestAnimationFrame(drawRope);
