@@ -359,71 +359,111 @@ const galerie = (await getCollection('galerie'))
     let turning = false, lastA = 0;
     const max = () => car.scrollWidth - car.clientWidth;
 
-    // Une seule corde, modélisée point par point (aucune image, aucun masque).
-    // Elle part du bord gauche, passe derrière la barre, puis file vers la droite en ondulant
-    // naturellement (léger mou + houle qui avance avec les photos). Son bout se termine par
-    // un petit rond, qui avance avec elle pendant tout le déploiement.
+    // Une seule corde torsadée (3 brins), modélisée point par point. Elle traverse l'écran
+    // depuis le bord gauche, passe derrière la barre et flotte en ondulant, même au repos.
+    // Vers son bout, elle fait un nœud de huit sur elle-même : lâche au début de la galerie,
+    // il se serre, puis la corde glisse avec les photos et le nœud sort de l'écran à droite.
     const NS = 'http://www.w3.org/2000/svg';
-    const WAVE = 14, WAVELEN = 240;
     const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
-    const ROPE = { outline: { stroke: '#241A12', 'stroke-width': 15 }, body: { stroke: '#D6A15E', 'stroke-width': 10 }, twist: { stroke: '#8A5A2B', 'stroke-width': 10, 'stroke-dasharray': '3 7' } };
+    const LAYERS = [
+      ['outline', { stroke: '#241A12', 'stroke-width': 19 }],
+      ['body', { stroke: '#D9B07A', 'stroke-width': 14 }],
+      ['strand', { stroke: '#9A6633', 'stroke-width': 3.2 }],
+      ['shine', { stroke: '#F0D2A4', 'stroke-width': 1.4 }],
+    ];
     let rp = null;
     if (rope) {
-      const g = mk('g', {}, rope);
-      rp = Object.fromEntries(Object.entries(ROPE).map(([k, at]) =>
-        [k, mk('path', { fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', ...at }, g)]));
+      // la corde entière, puis par-dessus les brins qui passent dessus aux croisements du nœud
+      rp = ['under', 'over'].map((pass) => {
+        const g = mk('g', {}, rope);
+        return Object.fromEntries(LAYERS.map(([k, at]) => [k, mk('path', {
+          fill: 'none', 'stroke-linecap': (pass === 'over' && k !== 'strand' && k !== 'shine') ? 'butt' : 'round', 'stroke-linejoin': 'round', ...at }, g)]));
+      });
     }
-    const toD = (pts) => pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
-    const bez = (P0, P1, P2, P3, n, out) => {
-      for (let i = 1; i <= n; i++) {
-        const t = i / n, u = 1 - t;
-        out.push([u*u*u*P0[0] + 3*u*u*t*P1[0] + 3*u*t*t*P2[0] + t*t*t*P3[0], u*u*u*P0[1] + 3*u*u*t*P1[1] + 3*u*t*t*P2[1] + t*t*t*P3[1]]);
+    const clamp = (v, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
+    const lerp = (x, y, u) => x + (y - x) * u;
+    const toD = (pts) => pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('');
+    // fibres en biais le long de la corde (effet torsadé), décalées quand la corde glisse
+    const fibers = (pts, sp, w, ang, off) => {
+      let d = '', acc = -off;
+      const c = Math.cos(ang), si = Math.sin(ang);
+      for (let i = 1; i < pts.length; i++) {
+        const ax = pts[i - 1][0], ay = pts[i - 1][1], dx = pts[i][0] - ax, dy = pts[i][1] - ay, l = Math.hypot(dx, dy);
+        if (!l) continue;
+        const tx = dx / l, ty = dy / l, vx = -ty * c + tx * si, vy = tx * c + ty * si;
+        for (let t = ((sp - ((acc % sp) + sp) % sp) % sp); t < l; t += sp) {
+          const px = ax + tx * t, py = ay + ty * t;
+          d += 'M' + (px - vx * w / 2).toFixed(1) + ' ' + (py - vy * w / 2).toFixed(1) + 'L' + (px + vx * w / 2).toFixed(1) + ' ' + (py + vy * w / 2).toFixed(1);
+        }
+        acc += l;
       }
+      return d;
     };
+    const cross = (p, q, r, t) => {
+      const d = (q[0] - p[0]) * (t[1] - r[1]) - (q[1] - p[1]) * (t[0] - r[0]);
+      if (Math.abs(d) < 1e-9) return null;
+      const u = ((r[0] - p[0]) * (t[1] - r[1]) - (r[1] - p[1]) * (t[0] - r[0])) / d;
+      const v = ((r[0] - p[0]) * (q[1] - p[1]) - (r[1] - p[1]) * (q[0] - p[0])) / d;
+      return u >= 0 && u < 1 && v >= 0 && v < 1 ? [u, v] : null;
+    };
+    const paint = (layers, pts, off) => {
+      const d = toD(pts);
+      layers.outline.setAttribute('d', d); layers.body.setAttribute('d', d);
+      layers.strand.setAttribute('d', fibers(pts, 7, 13, 0.75, off));
+      layers.shine.setAttribute('d', fibers(pts, 7, 9, 0.75, off - 2.6));
+    };
+    let floatT = 0;
     function drawRope() {
       if (!rp || !helm) return;
       const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2 + 6;
       rope.setAttribute('viewBox', `0 0 ${W} ${H}`);
       const prog = max() > 0 ? Math.min(1, car.scrollLeft / max()) : 0;
-      const phase = car.scrollLeft / 90;
-      const xHub = W / 2;
-      const RING = 16;                       // rayon du petit rond au bout
-      const xS = W - 40 - RING * 2;          // la corde s'arrête là à la fin de la galerie
-      // 1) corde : houle qui s'éteint vers l'épissure + léger mou entre la barre et l'œil
+      const xHub = W / 2, helmR = helm.clientWidth / 2;
+      const ph = prog * 10 + floatT * 0.0009;
+      // houle : la corde flotte et zigzague doucement, calme juste derrière la barre
+      const base = (x) => {
+        const env = Math.min(1, Math.abs(x - xHub) / 80);
+        return cy + env * (9 * Math.sin(x / 150 * Math.PI * 2 - ph) + 4 * Math.sin(x / 61 * Math.PI * 2 + ph * 1.3)) + 2.5 * Math.sin(floatT * 0.0016 + x / 90);
+      };
+      // nœud de huit (projection classique à 4 croisements), ouvert sur son bord gauche
+      const k = Math.min(1, W / 1100), SX = 1.2, SY = 0.78;
+      const sz = lerp(20, 16.5, clamp(prog / 0.6)) * Math.max(0.8, k);
+      const kw = 6.8 * SX * sz;
+      const xK0 = Math.min(Math.max(W * 0.6, xHub + helmR + 30), W - kw - 12);
+      const xK = xK0 + (W - xK0 + 40) * Math.pow(clamp((prog - 0.1) / 0.9), 1.6);
+      const cx = xK + 3.4 * SX * sz, cyK = base(cx) + 14;   // un peu plus bas : le nœud ne mord pas sur les photos
+      const knotPt = (t) => { const r = 2.4 + Math.cos(2 * t), X = cx + r * Math.cos(3 * t) * SX * sz; return [X, (base(X) + 14) * 0.35 + cyK * 0.65 + r * Math.sin(3 * t) * sz * SY]; };
+      const t0 = Math.PI + 0.16, t1 = Math.PI * 3 - 0.5;
       const pts = [];
-      const x0 = -10;
-      for (let x = x0; x <= xS; x += 6) {
-        const u = (x - x0) / (xS - x0);
-        const env = Math.sin(Math.PI * Math.min(1, u * 1.05)) * Math.min(1, Math.abs(x - xHub) / 60);
-        const sag = x > xHub ? 18 * Math.sin(Math.PI * (x - xHub) / (xS - xHub)) : 0;
-        pts.push([x, cy + sag + WAVE * env * Math.sin(((x - x0) / WAVELEN) * Math.PI * 2 - phase)]);
+      for (let x = -20; x < xK - 26; x += 4) pts.push([x, base(x)]);
+      const L = pts[pts.length - 1], P0 = knotPt(t0);
+      for (let i = 1; i <= 10; i++) { const u = i / 10, v = u * u * (3 - 2 * u); pts.push([L[0] + (P0[0] - L[0]) * u, L[1] + (P0[1] - L[1]) * v]); }
+      const iK = pts.length;
+      for (let i = 1; i <= 300; i++) pts.push(knotPt(t0 + (t1 - t0) * i / 300));
+      // croisements : dessus / dessous en alternance le long de la corde
+      const ev = [];
+      for (let i = iK - 12; i < pts.length - 1; i++) for (let j = i + 3; j < pts.length - 1; j++) {
+        const r = cross(pts[i], pts[i + 1], pts[j], pts[j + 1]);
+        if (r) ev.push(i + r[0], j + r[1]);
       }
-      // longueurs cumulées
-      const L = [0];
-      for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-      const total = L[L.length - 1];
-      let iHub = pts.findIndex((q) => q[0] >= xHub + 12); if (iHub < 0) iHub = 0;
-      // 3) longueur déroulée : jusqu'à la barre au départ, jusqu'au bout droit à la fin
-      const vis = L[iHub] + (total - L[iHub]) * prog;
-      const shown = [];
-      for (let i = 0; i < pts.length; i++) {
-        if (L[i] <= vis) { shown.push(pts[i]); continue; }
-        const f = (vis - L[i - 1]) / (L[i] - L[i - 1]);
-        shown.push([pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f]);
-        break;
-      }
-      // 4) le petit rond au bout : la corde continue tout droit puis se referme en cercle
-      const tip = shown[shown.length - 1], prev = shown[Math.max(0, shown.length - 3)];
-      const ang = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]);
-      const cx = tip[0] + Math.cos(ang) * RING, cyR = tip[1] + Math.sin(ang) * RING;
-      const ring = [];
-      for (let i = 1; i <= 40; i++) {
-        const t = ang + Math.PI + (i / 40) * Math.PI * 2;
-        ring.push([cx + Math.cos(t) * RING, cyR + Math.sin(t) * RING]);
-      }
-      const d = toD(shown.concat(ring));
-      for (const k of ['outline', 'body', 'twist']) rp[k].setAttribute('d', d);
-      rp.twist.setAttribute('stroke-dashoffset', String(-car.scrollLeft * 0.6));
+      ev.sort((m, n) => m - n);
+      const over = ev.filter((_, i) => i % 2 === 0).map(Math.round);
+      const off = xK - xK0;                    // la corde glisse avec le nœud
+      paint(rp[0], pts, off);
+      const pieces = over.map((o) => pts.slice(Math.max(0, o - 9), o + 10));
+      const d = pieces.map(toD).join('');
+      rp[1].outline.setAttribute('d', d); rp[1].body.setAttribute('d', d);
+      rp[1].strand.setAttribute('d', pieces.map((q) => fibers(q, 7, 13, 0.75, off)).join(''));
+      rp[1].shine.setAttribute('d', pieces.map((q) => fibers(q, 7, 9, 0.75, off - 2.6)).join(''));
+    }
+    // flottement permanent, seulement quand la corde est à l'écran (et pas si l'animation est réduite)
+    if (rope && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let on = false, raf = 0;
+      const loop = (ts) => { floatT = ts; drawRope(); if (on) raf = requestAnimationFrame(loop); };
+      new IntersectionObserver(([e]) => {
+        on = e.isIntersecting;
+        if (on) raf = requestAnimationFrame(loop); else cancelAnimationFrame(raf);
+      }).observe(rope);
     }
     addEventListener('resize', drawRope);
     requestAnimationFrame(drawRope);
@@ -560,7 +600,7 @@ const galerie = (await getCollection('galerie'))
   /* barre à roue : 30 % posée sur les photos, 70 % dessous */
   .helm-wrap{--helm:190px;display:flex;justify-content:center;position:relative;z-index:3;isolation:isolate;
     margin-top:calc(var(--helm) * -.3 - 20px);pointer-events:none}
-  /* corde tressée qui traverse l'écran derrière la barre et défile avec les photos */
+  /* corde torsadée qui traverse l'écran derrière la barre, flotte et fait un nœud de huit */
   .rope{position:absolute;top:50%;left:50%;width:100vw;height:240px;transform:translate(-50%,-50%);z-index:-1;
     overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(36,26,18,.18))}
   .helm{width:var(--helm);height:var(--helm);border-radius:50%;cursor:grab;touch-action:none;pointer-events:auto;
