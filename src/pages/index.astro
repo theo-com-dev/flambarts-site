@@ -7,7 +7,7 @@ import { getCollection } from 'astro:content';
 
 // Version de la vidéo du hero : à augmenter à chaque nouvelle vidéo pour que les navigateurs
 // ne gardent pas l'ancienne en mémoire.
-const heroV = '9';
+const heroV = '10';
 
 // Morceaux à écouter — éditables depuis /admin (collection « musique »).
 const extraits = (await getCollection('musique'))
@@ -360,9 +360,9 @@ const galerie = (await getCollection('galerie'))
     const max = () => car.scrollWidth - car.clientWidth;
 
     // Une seule corde torsadée (3 brins), modélisée point par point. Elle traverse l'écran
-    // depuis le bord gauche, passe derrière la barre et flotte en ondulant, même au repos.
-    // Vers son bout, elle fait un nœud de huit sur elle-même : lâche au début de la galerie,
-    // il se serre, puis la corde glisse avec les photos et le nœud sort de l'écran à droite.
+    // depuis le bord gauche, passe derrière la barre en ondulant. Elle est immobile : seul son bout bouge.
+    // Son bout avance vers la droite au fil des photos en zigzaguant et en s'enroulant sur
+    // lui-même, et finit par sortir de l'écran à droite à la fin de la galerie.
     const NS = 'http://www.w3.org/2000/svg';
     const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
     const LAYERS = [
@@ -412,58 +412,54 @@ const galerie = (await getCollection('galerie'))
       layers.strand.setAttribute('d', fibers(pts, 7, 13, 0.75, off));
       layers.shine.setAttribute('d', fibers(pts, 7, 9, 0.75, off - 2.6));
     };
-    let floatT = 0;
     function drawRope() {
       if (!rp || !helm) return;
       const W = rope.clientWidth, H = rope.clientHeight, cy = H / 2 + 6;
       rope.setAttribute('viewBox', `0 0 ${W} ${H}`);
       const prog = max() > 0 ? Math.min(1, car.scrollLeft / max()) : 0;
       const xHub = W / 2, helmR = helm.clientWidth / 2;
-      const ph = prog * 10 + floatT * 0.0009;
-      // houle : la corde flotte et zigzague doucement, calme juste derrière la barre
+      // ondulation fixe de la corde, calme juste derrière la barre (la corde ne bouge pas toute seule)
       const base = (x) => {
         const env = Math.min(1, Math.abs(x - xHub) / 80);
-        return cy + env * (9 * Math.sin(x / 150 * Math.PI * 2 - ph) + 4 * Math.sin(x / 61 * Math.PI * 2 + ph * 1.3)) + 2.5 * Math.sin(floatT * 0.0016 + x / 90);
+        return cy + env * (9 * Math.sin(x / 150 * Math.PI * 2) + 4 * Math.sin(x / 61 * Math.PI * 2)) + 2.5 * Math.sin(x / 90);
       };
-      // nœud de huit (projection classique à 4 croisements), ouvert sur son bord gauche
-      const k = Math.min(1, W / 1100), SX = 1.2, SY = 0.78;
-      const sz = lerp(20, 16.5, clamp(prog / 0.6)) * Math.max(0.8, k);
-      const kw = 6.8 * SX * sz;
-      const xK0 = Math.min(Math.max(W * 0.6, xHub + helmR + 30), W - kw - 12);
-      const xK = xK0 + (W - xK0 + 40) * Math.pow(clamp((prog - 0.1) / 0.9), 1.6);
-      const cx = xK + 3.4 * SX * sz, cyK = base(cx) + 14;   // un peu plus bas : le nœud ne mord pas sur les photos
-      const knotPt = (t) => { const r = 2.4 + Math.cos(2 * t), X = cx + r * Math.cos(3 * t) * SX * sz; return [X, (base(X) + 14) * 0.35 + cyK * 0.65 + r * Math.sin(3 * t) * sz * SY]; };
-      const t0 = Math.PI + 0.16, t1 = Math.PI * 3 - 0.5;
+      // Le bout de la corde avance vers la droite en traçant son chemin : il zigzague, puis
+      // s'enroule sur lui-même (une boucle tous les trois zigzags, une fois vers le haut, une fois
+      // vers le bas). La corde, c'est la trace laissée par le bout : les boucles restent en place.
+      const k = Math.max(0.75, Math.min(1, W / 1100));
+      const STEP = 8 * k;                      // avance par radian
+      const A_ZIG = 5 * k, A_LOOP = 40 * k;   // petite ondulation / boucle (boucle dès que A > STEP)
+      const xS = xHub - 12;                    // départ du tracé, caché derrière la barre
+      const PERIOD = Math.PI * 6;
+      const trail = (t) => {
+        const T = t + Math.PI * 2;                // décalage : la 1re boucle reste cachée derrière la barre
+        const u = (T % PERIOD) / PERIOD, sgn = Math.floor(T / PERIOD) % 2 ? 1 : -0.7;   // boucles vers le haut plus petites (photos au-dessus)
+        const bump = Math.max(0, Math.sin(Math.PI * (3 * u - 1)));
+        const amp = A_ZIG + (A_LOOP - A_ZIG) * bump * bump;
+        const x = xS + STEP * t + amp * Math.sin(t);
+        return [x, base(x) + sgn * amp * (1 - Math.cos(t)) * 0.72];
+      };
+      const tStart = (xHub + helmR + 30 - xS) / STEP;
+      const tEnd = (W + 60 - xS) / STEP;       // à la fin, le bout est sorti de l'écran à droite
+      const tTip = tStart + (tEnd - tStart) * prog;
       const pts = [];
-      for (let x = -20; x < xK - 26; x += 4) pts.push([x, base(x)]);
-      const L = pts[pts.length - 1], P0 = knotPt(t0);
-      for (let i = 1; i <= 10; i++) { const u = i / 10, v = u * u * (3 - 2 * u); pts.push([L[0] + (P0[0] - L[0]) * u, L[1] + (P0[1] - L[1]) * v]); }
-      const iK = pts.length;
-      for (let i = 1; i <= 300; i++) pts.push(knotPt(t0 + (t1 - t0) * i / 300));
-      // croisements : dessus / dessous en alternance le long de la corde
+      for (let x = -20; x < xS; x += 4) pts.push([x, base(x)]);
+      const iT = pts.length, N = Math.ceil(tTip * 7);
+      for (let i = 0; i <= N; i++) pts.push(trail(tTip * i / N));
+      // croisements dans les boucles : dessus / dessous en alternance le long de la corde
       const ev = [];
-      for (let i = iK - 12; i < pts.length - 1; i++) for (let j = i + 3; j < pts.length - 1; j++) {
+      for (let i = iT; i < pts.length - 1; i++) for (let j = i + 3; j < Math.min(pts.length - 1, i + 60); j++) {
         const r = cross(pts[i], pts[i + 1], pts[j], pts[j + 1]);
         if (r) ev.push(i + r[0], j + r[1]);
       }
       ev.sort((m, n) => m - n);
       const over = ev.filter((_, i) => i % 2 === 0).map(Math.round);
-      const off = xK - xK0;                    // la corde glisse avec le nœud
-      paint(rp[0], pts, off);
-      const pieces = over.map((o) => pts.slice(Math.max(0, o - 9), o + 10));
+      paint(rp[0], pts, 0);
+      const pieces = over.map((o) => pts.slice(Math.max(0, o - 8), o + 9));
       const d = pieces.map(toD).join('');
       rp[1].outline.setAttribute('d', d); rp[1].body.setAttribute('d', d);
-      rp[1].strand.setAttribute('d', pieces.map((q) => fibers(q, 7, 13, 0.75, off)).join(''));
-      rp[1].shine.setAttribute('d', pieces.map((q) => fibers(q, 7, 9, 0.75, off - 2.6)).join(''));
-    }
-    // flottement permanent, seulement quand la corde est à l'écran (et pas si l'animation est réduite)
-    if (rope && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      let on = false, raf = 0;
-      const loop = (ts) => { floatT = ts; drawRope(); if (on) raf = requestAnimationFrame(loop); };
-      new IntersectionObserver(([e]) => {
-        on = e.isIntersecting;
-        if (on) raf = requestAnimationFrame(loop); else cancelAnimationFrame(raf);
-      }).observe(rope);
+      rp[1].strand.setAttribute('d', pieces.map((q) => fibers(q, 7, 13, 0.75, 0)).join(''));
+      rp[1].shine.setAttribute('d', pieces.map((q) => fibers(q, 7, 9, 0.75, -2.6)).join(''));
     }
     addEventListener('resize', drawRope);
     requestAnimationFrame(drawRope);
@@ -600,7 +596,7 @@ const galerie = (await getCollection('galerie'))
   /* barre à roue : 30 % posée sur les photos, 70 % dessous */
   .helm-wrap{--helm:190px;display:flex;justify-content:center;position:relative;z-index:3;isolation:isolate;
     margin-top:calc(var(--helm) * -.3 - 20px);pointer-events:none}
-  /* corde torsadée qui traverse l'écran derrière la barre, flotte et fait un nœud de huit */
+  /* corde torsadée qui traverse l'écran derrière la barre, zigzague et s'enroule */
   .rope{position:absolute;top:50%;left:50%;width:100vw;height:240px;transform:translate(-50%,-50%);z-index:-1;
     overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(36,26,18,.18))}
   .helm{width:var(--helm);height:var(--helm);border-radius:50%;cursor:grab;touch-action:none;pointer-events:auto;
